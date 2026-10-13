@@ -1,0 +1,170 @@
+{
+  "stills": "frame 0 used in the 4x10 comparison",
+  "videos": "full clips matching those stills where one exists. RoboSnap has no matching video. ours.png is Image Blaster; ours_isaac_invert.mp4 is the separate Isaac replay.",
+  "scenes": [
+    {
+      "key": "rpl-164606",
+      "stills": {
+        "gt.png": "data/10scenes/rpl-164606/original/original_frame0 (1).png",
+        "robosnap.png": "data/robosnap_official_visual/rpl-164606/simscale/robosnap_layered_original_view_with_arm.png",
+        "rola.png": "data/rola_official_replay/rpl-164606/simscale/rola_h5_replay_camera_start.png",
+        "ours.png": "data/scenetwin_imageblaster/rpl-164606/simscale/scenetwin_imageblaster_frame0_with_arm.png",
+        "gpt6.png": "data/gpt6_visual_ten/rpl-164606/simscale/gpt6_living_frame0.png"
+      },
+      "videos": {
+        "gt.mp4": "experiment/eval_scenes_raw/rpl-164606/videos/ext1.mp4",
+        "rola.mp4": "baseline_result/RoLA-Data/outputs/24013089/simulation/vis/h5_replay_camera.mp4",
+        "gpt6.mp4": "gpt6-astra-10scenes/5scenes/runs/20260908T083940_609888Z/rpl-164606/ext1/replay.mp4",
+        "gpt6_wrist.mp4": "gpt6-astra-10scenes/5scenes/runs/20260908T083940_609888Z/rpl-164606/wrist/replay.mp4",
+        "ours_isaac_invert.mp4": "experiment/visual_review/invert_tonemap/rpl-164606/replay_cam_recon.mp4"
+      }
+    },
+    {
+      "key": "real-112523",
+      "stills": {
+        "gt.png": "data/10scenes/real-112523/original/original_f0.png",
+        "robosnap.png": "data/robosnap_official_visual/real-112523/simscale/robosnap_layered_original_view_with_arm.png",
+        "rola.png": "data/rola_official_replay/real-112523/simscale/rola_h5_replay_camera_start.png",
+        "ours.png": "data/scenetwin_imageblaster/real-112523/simscale/scenetwin_imageblaster_frame0_with_arm.png",
+        "gpt6.png": "data/gpt6_visual_ten/real-112523/simscale/gpt6_living_frame0.png"
+      },
+      "videos": {
+        "gt.mp4": "experiment/eval_scenes_raw/real-112523/videos/ext1.mp4",
+        "rola.mp4": "baseline_result/RoLA-Data/outputs/20540549/simulation/vis/h5_replay_camera.mp4",
+        "gpt6.mp4": "gpt6-astra-10scenes/other5scenes/runs/20260908T101827_582159Z/real-112523/ext1/replay.mp4",
+        "gpt6_wrist.mp4": "gpt6-astra-10scenes/other5scenes/runs/20260908T101827_582159Z/real-112523/wrist/replay.mp4",
+        "ours_isaac_invert.mp4": "experiment/visual_review/invert_tonemap/real-112523/replay_cam_recon.mp4"
+      }
+    },
+    {
+      "key": "rad-155000",
+      "stills": {
+        "gt.png": "data/10scenes/rad/original/original_frame0 (2).png",
+        "robosnap.png": "data/robosnap_official_visual/rad-155000/simscale/robosnap_layered_original_view_with_arm.png",
+        "rola.png": "data/rola_official_replay/rad/simscale/rola_h5_replay_camera_start.png",
+        "ours.png": "data/scenetwin_imageblaster/rad/simscale/scenetwin_imageblaster_frame0_with_arm.png",
+        "gpt6.png": "data/gpt6_visual_ten/rad-155000/simscale/gpt6_living_frame0.png"
+      },
+      "videos": {
+        "gt.mp4": "experiment/eval_scenes_raw/rad-155000/videos/ext2.mp4",
+        "rola.mp4": "baseline_result/RoLA-Data/outputs/35215462/simulation/vis/h5_replay_camera.mp4",
+        "gpt6.mp4": "gpt6-astra-10scenes/other5scenes/runs/20260908T101827_582159Z/rad-155000/ext2/replay.mp4"
+      }
+    },
+    {
+      "key": "guptalab-153414",
+      "stills": {
+        "gt.png": "data/10scenes/guptalab-153414/original/original_frame0 (3).png",
+        "robosnap.png": "data/robosnap_official_visual/guptalab-153414/simscale/robosnap_layered_original_view_with_arm.png",
+        "rola.png": "data/rola_official_replay/guptalab-153414/simscale/rola_h5_replay_camera_start.png",
+        "ours.png": "data/scenetwin_imageblaster/guptalab-153414/simscale/scenetwin_imageblaster_frame0_with_arm.png",
+        "gpt6.png": "data/gpt6_visual_ten/guptalab-153414/simscale/gpt6_living_frame0.png"
+      },
+      "videos": {
+        "gt.mp4": "experiment/eval_scenes_raw/guptalab-153414/videos/ext2.mp4",
+        "rola.mp4": "baseline_result/RoLA-Data/outputs/26638268/simulation/vis/h5_replay_camera.mp4",
+        "gpt6.mp4": "gpt6-astra-10scenes/5scenes/runs/20260908T083940_609888Z/guptalab-153414/ext2/replay.mp4",
+        "gpt6_wrist.mp4": "gpt6-astra-10scenes/5scenes/runs/20260908T083940_609888Z/guptalab-153414/wrist/replay.mp4",
+        "ours_isaac_invert.mp4": "experiment/visual_review/invert_tonemap/guptalab-153414/replay_cam_recon.mp4"
+      }
+    },
+    {
+      "key": "iris-101439",
+      "stills": {
+        "gt.png": "data/10scenes/iris-101439/original/original_f0 (1).png",
+        "robosnap.png": "data/robosnap_official_visual/iris-101439/simscale/robosnap_layered_original_view_with_arm.png",
+        "rola.png": "data/rola_official_replay/iris-101439/simscale/rola_h5_replay_camera_start.png",
+        "ours.png": "data/scenetwin_imageblaster/iris-101439/simscale/scenetwin_imageblaster_frame0_with_arm.png",
+        "gpt6.png": "data/gpt6_visual_ten/iris-101439/simscale/gpt6_living_frame0.png"
+      },
+      "videos": {
+        "gt.mp4": "experiment/eval_scenes_raw/iris-101439/videos/ext1.mp4",
+        "rola.mp4": "baseline_result/RoLA-Data/outputs/iris-101439/simulation/vis/h5_replay_camera.mp4",
+        "gpt6.mp4": "gpt6-astra-10scenes/other5scenes/runs/20260908T101827_582159Z/iris-101439/ext1/replay.mp4",
+        "ours_isaac_invert.mp4": "experiment/visual_review/invert_tonemap/iris-101439/replay_cam_recon.mp4"
+      }
+    },
+    {
+      "key": "iliad-161943",
+      "stills": {
+        "gt.png": "data/10scenes/iliad/original/original_recon_f0.png",
+        "robosnap.png": "data/robosnap_official_visual/iliad-161943/simscale/robosnap_layered_original_view_with_arm.png",
+        "rola.png": "data/rola_official_replay/iliad/simscale/rola_h5_replay_camera_start.png",
+        "ours.png": "data/scenetwin_imageblaster/iliad/simscale/scenetwin_imageblaster_frame0_with_arm.png",
+        "gpt6.png": "data/gpt6_visual_ten/iliad-161943/simscale/gpt6_living_frame0.png"
+      },
+      "videos": {
+        "gt.mp4": "experiment/eval_scenes_raw/iliad-161943/videos/ext2.mp4",
+        "rola.mp4": "baseline_result/RoLA-Data/outputs/27904255/simulation/vis/h5_replay_camera.mp4",
+        "gpt6.mp4": "gpt6-astra-10scenes/other5scenes/runs/20260908T101827_582159Z/iliad-161943/ext2/replay.mp4",
+        "ours_isaac_invert.mp4": "experiment/visual_review/invert_tonemap/iliad-161943/replay_cam_recon.mp4"
+      }
+    },
+    {
+      "key": "rail-152727",
+      "stills": {
+        "gt.png": "data/10scenes/rail/original/original_frame0 (4).png",
+        "robosnap.png": "data/robosnap_official_visual/rail-152727/simscale/robosnap_layered_original_view_with_arm.png",
+        "rola.png": "data/rola_official_replay/rail/simscale/rola_h5_replay_camera_start.png",
+        "ours.png": "data/scenetwin_imageblaster/rail/simscale/scenetwin_imageblaster_frame0_with_arm.png",
+        "gpt6.png": "data/gpt6_visual_ten/rail-152727/simscale/gpt6_living_frame0.png"
+      },
+      "videos": {
+        "gt.mp4": "experiment/eval_scenes_raw/rail-152727/videos/ext1.mp4",
+        "rola.mp4": "baseline_result/RoLA-Data/outputs/20521388/simulation/vis/h5_replay_camera.mp4",
+        "gpt6.mp4": "gpt6-astra-10scenes/5scenes/runs/20260908T083940_609888Z/rail-152727/ext1/replay.mp4",
+        "gpt6_wrist.mp4": "gpt6-astra-10scenes/5scenes/runs/20260908T083940_609888Z/rail-152727/wrist/replay.mp4",
+        "ours_isaac_invert.mp4": "experiment/visual_review/invert_tonemap/rail-152727/replay_cam_recon.mp4"
+      }
+    },
+    {
+      "key": "iris-153900",
+      "stills": {
+        "gt.png": "data/10scenes/iris-153900/original/original_frame0 (5).png",
+        "robosnap.png": "data/robosnap_official_visual/iris-153900/simscale/robosnap_layered_original_view_with_arm.png",
+        "rola.png": "data/rola_official_replay/iris-153900/simscale/rola_h5_replay_camera_start.png",
+        "ours.png": "data/scenetwin_imageblaster/iris-153900/simscale/scenetwin_imageblaster_frame0_with_arm.png",
+        "gpt6.png": "data/gpt6_visual_ten/iris-153900/simscale/gpt6_living_frame0.png"
+      },
+      "videos": {
+        "gt.mp4": "experiment/eval_scenes_raw/iris-153900/videos/ext2.mp4",
+        "rola.mp4": "baseline_result/RoLA-Data/outputs/iris-153900/simulation/vis/h5_replay_camera.mp4",
+        "gpt6.mp4": "gpt6-astra-10scenes/5scenes/runs/20260908T083940_609888Z/iris-153900/ext2/replay.mp4",
+        "gpt6_wrist.mp4": "gpt6-astra-10scenes/5scenes/runs/20260908T083940_609888Z/iris-153900/wrist/replay.mp4",
+        "ours_isaac_invert.mp4": "experiment/visual_review/invert_tonemap/iris-153900/replay_cam_recon.mp4"
+      }
+    },
+    {
+      "key": "rad-180233",
+      "stills": {
+        "gt.png": "data/10scenes/rad-180233/original/original_frame0.png",
+        "robosnap.png": "data/robosnap_official_visual/rad-180233/simscale/robosnap_layered_original_view_with_arm.png",
+        "rola.png": "data/rola_official_replay/rad-180233/simscale/rola_h5_replay_camera_start.png",
+        "ours.png": "data/scenetwin_imageblaster/rad-180233/simscale/scenetwin_imageblaster_frame0_with_arm.png",
+        "gpt6.png": "data/gpt6_visual_ten/rad-180233/simscale/gpt6_living_frame0.png"
+      },
+      "videos": {
+        "gt.mp4": "experiment/eval_scenes_raw/rad-180233/videos/ext1.mp4",
+        "rola.mp4": "baseline_result/RoLA-Data/outputs/rad-180233/simulation/vis/h5_replay_camera.mp4",
+        "gpt6.mp4": "gpt6-astra-10scenes/5scenes/runs/20260908T083940_609888Z/rad-180233/ext1/replay.mp4",
+        "gpt6_wrist.mp4": "gpt6-astra-10scenes/5scenes/runs/20260908T083940_609888Z/rad-180233/wrist/replay.mp4",
+        "ours_isaac_invert.mp4": "experiment/visual_review/invert_tonemap/rad-180233_frozen15hz/replay_cam_recon.mp4"
+      }
+    },
+    {
+      "key": "rail-105805",
+      "stills": {
+        "gt.png": "data/10scenes/rail-105805/original/original_frame0.png",
+        "robosnap.png": "data/robosnap_official_visual/rail-105805/simscale/robosnap_layered_original_view_with_arm.png",
+        "rola.png": "data/rola_official_replay/rail-105805/simscale/rola_h5_replay_camera_start.png",
+        "ours.png": "data/scenetwin_imageblaster/rail-105805/simscale/scenetwin_imageblaster_frame0_with_arm.png",
+        "gpt6.png": "data/gpt6_visual_ten/rail-105805/simscale/gpt6_living_frame0.png"
+      },
+      "videos": {
+        "gt.mp4": "experiment/eval_scenes_raw/rail-105805/videos/ext1.mp4",
+        "rola.mp4": "baseline_result/RoLA-Data/outputs/rail-105805/simulation/vis/h5_replay_camera.mp4",
+        "gpt6.mp4": "gpt6-astra-10scenes/other5scenes/runs/20260908T101827_582159Z/rail-105805/ext1/replay.mp4"
+      }
+    }
+  ]
+}

@@ -1,0 +1,1122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#fbfaf6" />
+  <meta name="description" content="WorldMirror — Agentic real-to-sim generation of interactive worlds from in-the-wild robot demonstrations." />
+  <title>WorldMirror · Agentic Real-to-Sim</title>
+  <style>
+    :root {
+      --ink: #0a1021;
+      --ink-2: #111a32;
+      --paper: #f4f2ea;
+      --paper-2: #ebe8dd;
+      --muted: #778197;
+      --line: rgba(19, 31, 57, .15);
+      --cyan: #71e1d0;
+      --cyan-2: #b5fff1;
+      --orange: #ffb45e;
+      --pink: #f29bb5;
+      --lime: #d1f36b;
+      --white: #fbfbf7;
+      --shadow: 0 20px 70px rgba(5, 11, 28, .2);
+      --radius: 24px;
+      --max: 1240px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 84px; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.5; overflow-x: hidden; }
+    img { max-width: 100%; display: block; }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; }
+    .progress { position: fixed; inset: 0 0 auto; height: 3px; background: linear-gradient(90deg, var(--cyan), var(--lime), var(--orange)); transform-origin: left; transform: scaleX(0); z-index: 100; }
+    .site-nav { position: fixed; top: 3px; left: 0; width: 100%; z-index: 90; transition: background .3s ease, box-shadow .3s ease; }
+    .site-nav.scrolled { background: rgba(10,16,33,.88); backdrop-filter: blur(18px); box-shadow: 0 8px 34px rgba(0,0,0,.18); }
+    .nav-inner { max-width: var(--max); margin: auto; display:flex; align-items:center; justify-content:space-between; padding: 18px 28px; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--white); font-weight: 800; letter-spacing: -.04em; }
+    .brand-mark { display: block; width: 34px; height: 34px; flex: none; border-radius: 50%; overflow: hidden; border: 1px solid rgba(23,52,90,.35); box-shadow: 0 0 0 3px rgba(84,203,187,.16); }
+    .brand-mark img { width: 100%; height: 100%; max-width: none; object-fit: cover; transform: scale(1.16); transform-origin: center; }
+    .brand small { display:block; color: #a7b0c5; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; font-size: 9px; line-height: 1.1; }
+    .nav-links { display:flex; gap: 24px; align-items:center; color: #c3cadd; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .nav-links a { opacity: .75; transition: color .2s, opacity .2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--cyan-2); opacity: 1; }
+    .nav-action { border: 1px solid rgba(181,255,241,.45); color: var(--cyan-2); border-radius: 999px; padding: 8px 13px; font-size: 11px; letter-spacing: .08em; background: rgba(113,225,208,.08); }
+    .menu-btn { display:none; border:0; background:none; color:#fff; font-size:24px; }
+    .hero { position: relative; min-height: 100svh; display: flex; align-items: center; justify-content: center; padding: 128px 28px 96px; overflow: hidden; background: #f3efe6; }
+    .hero-bg { position: absolute; inset: 0; z-index: 0; }
+    .hero-bg video { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: center 42%; display: block; opacity: 0; z-index: 0; transition: opacity .4s linear; }
+    .hero-bg video.is-active { opacity: 1; }
+    .hero-bg video.is-front { z-index: 1; }
+    .hero-bg::after { content: ""; position: absolute; inset: 0; z-index: 2; background: linear-gradient(180deg, rgba(251,250,246,.94) 0%, rgba(251,250,246,.74) 26%, rgba(251,250,246,.42) 58%, rgba(251,250,246,.86) 100%); }
+    .hero-inner { position: relative; z-index: 1; max-width: 980px; margin: auto; text-align: center; }
+    .eyebrow { display:flex; align-items:center; gap: 10px; color: var(--cyan-2); font-size: 11px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+    .eyebrow:before { content:""; width:30px; height:1px; background: var(--cyan); }
+    h1 { margin: 0; font-weight: 650; }
+    .project-name { display: block; font-size: clamp(52px, 8.4vw, 104px); line-height: .92; letter-spacing: -.055em; font-weight: 760; color: #17345a; }
+    .project-name em { font-style: normal; color: #178f86; }
+    .paper-title { display: block; max-width: 760px; margin: 18px auto 0; font-size: clamp(18px, 2.15vw, 28px); line-height: 1.35; letter-spacing: -.02em; font-weight: 620; color: #1d3f66; text-wrap: balance; }
+    .authors { margin: 0; }
+    .authors:not(:empty) { max-width: 820px; margin: 22px auto 0; color: #4c627c; font-size: 15px; line-height: 1.7; }
+    .hero-cta { margin-top: 28px; display:flex; justify-content: center; flex-wrap:wrap; gap: 12px; }
+    .hero-cta .btn { padding: 12px 22px; font-size: 14px; }
+    .btn { display:inline-flex; align-items:center; gap: 8px; border-radius: 999px; padding: 13px 18px; border: 1px solid transparent; font-size: 13px; font-weight: 800; letter-spacing: .02em; cursor:pointer; transition: transform .2s, background .2s, border .2s; }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary { background: var(--cyan); color: var(--ink); }
+    .btn-secondary { color: var(--white); border-color: rgba(255,255,255,.25); background: rgba(255,255,255,.06); }
+    .btn-secondary:hover { background: rgba(255,255,255,.12); }
+    :focus-visible { outline: 3px solid #177f83; outline-offset: 5px; }
+    .signal { background: var(--cyan); color: var(--ink); padding: 16px 28px; }
+    .signal-inner { max-width: var(--max); margin:auto; display:flex; justify-content:space-between; gap: 20px; align-items:center; font-size: 12px; font-weight: 900; letter-spacing:.11em; text-transform:uppercase; }
+    .signal-flow { display:flex; gap: 11px; align-items:center; flex-wrap:wrap; }
+    .signal-flow i { width: 7px; height:7px; display:inline-block; border-radius:50%; background:var(--ink); opacity:.7; }
+    .section { padding: 76px 28px; position:relative; }
+    .section-inner { max-width:var(--max); margin:auto; }
+    .section-kicker { display:flex; align-items:center; gap: 11px; color: #63708a; font-weight: 800; letter-spacing:.15em; text-transform:uppercase; font-size:11px; }
+    .section-kicker:before { content:""; width:28px; height:1px; background: currentColor; }
+    .section-title { max-width: 800px; margin: 16px 0 0; font-size: clamp(26px, 3.1vw, 38px); line-height: 1.2; letter-spacing: -.035em; }
+    .section-title em { font-style:normal; color:#5277ab; }
+    .intro-grid { display:grid; grid-template-columns: 1.04fr .96fr; gap: 78px; align-items:end; }
+    .intro-copy { max-width: 560px; font-size:18px; color:#506079; }
+    .intro-copy strong { color: var(--ink); }
+    .why-grid { margin-top: 65px; display:grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+    .why-card { padding: 27px; border-top: 2px solid var(--ink); background: rgba(255,255,255,.38); min-height: 210px; transition: transform .25s, background .25s; }
+    .why-card:hover { transform: translateY(-6px); background:#fffdf8; }
+    .why-num { color:#7e8ca7; font: 700 12px ui-monospace, monospace; }
+    .why-card h3 { margin: 36px 0 9px; font-size:22px; letter-spacing:-.04em; }
+    .why-card p { margin:0; color:#67748a; font-size:14px; }
+    .overview-head { max-width: 720px; margin-inline: auto; text-align: center; }
+    .overview-head .section-kicker { justify-content: center; }
+    .overview-head .section-title { margin-inline: auto; text-wrap: balance; }
+    .story-abstract { margin: 32px auto 0; max-width: 38rem; text-align: center; }
+    .story-abstract p { margin: 0; color: #506079; font-size: 17px; line-height: 1.62; }
+    .story-abstract p + p { margin-top: 12px; }
+    .story-teaser { margin: 40px 0 0; }
+    .story-teaser .art-frame img { width: 100%; height: auto; cursor: zoom-in; }
+    .story-teaser .art-caption { flex-wrap: wrap; align-items: baseline; }
+    .story-teaser .art-caption span:first-child { flex: 1 1 18rem; }
+    .story-abstract + .why-grid { margin-top: 88px; }
+    .dark-section { background: var(--ink); color: var(--white); }
+    .dark-section .section-kicker { color: var(--cyan); }
+    .dark-section .section-title em { color: var(--cyan); }
+    .method-intro { display:grid; grid-template-columns: .85fr 1.15fr; gap: 60px; align-items:end; }
+    .method-copy { color: #aab5cb; max-width: 480px; font-size:17px; }
+    .method-art { margin-top: 58px; position:relative; }
+    .art-frame { border:1px solid rgba(181,255,241,.28); border-radius: 22px; padding: 13px; background: rgba(255,255,255,.045); }
+    .art-frame img { border-radius:13px; width:100%; height:auto; background:#f5f5ef; }
+    .art-caption { display:flex; justify-content:space-between; gap: 14px; color:#8290aa; font-size:11px; text-transform:uppercase; letter-spacing:.09em; margin-top: 12px; }
+    .step-row { margin-top: 36px; display:grid; grid-template-columns: repeat(6, 1fr); gap: 9px; }
+    .step { text-align:left; border:1px solid rgba(181,255,241,.16); border-radius: 13px; padding: 15px 13px; min-height: 105px; color:#7e8ca7; background:transparent; cursor:pointer; transition:.2s; }
+    .step:hover, .step.is-active { border-color:var(--cyan); background: rgba(113,225,208,.1); color:var(--white); }
+    .step strong { display:block; color:var(--cyan); font:700 11px ui-monospace,monospace; }
+    .step b { display:block; margin-top: 10px; font-size:13px; line-height:1.18; letter-spacing:-.02em; }
+    .loop-detail { margin-top: 17px; display:grid; grid-template-columns: 90px 1fr auto; align-items:center; gap: 20px; border-top: 1px solid rgba(181,255,241,.2); border-bottom: 1px solid rgba(181,255,241,.2); padding: 18px 0; }
+    .detail-index { font: 700 38px ui-monospace, monospace; color: rgba(181,255,241,.25); }
+    .detail-copy strong { display:block; font-size:17px; }
+    .detail-copy span { color:#8e9ab2; font-size:13px; }
+    .detail-tag { padding: 8px 10px; border-radius: 8px; color:var(--ink); background:var(--lime); font-size:10px; letter-spacing:.1em; font-weight:900; text-transform:uppercase; }
+    .fidelity { background: var(--paper-2); }
+    .metric-strip { margin-top: 52px; display:grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+    .metric-card { background: var(--paper); border: 1px solid var(--line); border-radius: 17px; padding: 22px; }
+    .metric-card span { display:block; color:#718098; font-size:11px; font-weight:800; letter-spacing:.11em; text-transform:uppercase; }
+    .metric-card strong { display:block; margin: 9px 0 2px; font-size: 43px; line-height:.95; letter-spacing:-.07em; }
+    .metric-card p { margin:0; color:#748098; font-size:13px; }
+    .metric-card.cyan strong { color:#238b81; }
+    .metric-card.orange strong { color:#b56819; }
+    .metric-card.lime strong { color:#6d891d; }
+    .evidence-grid { margin-top: 62px; display:grid; grid-template-columns: 1.12fr .88fr; gap: 50px; align-items:start; }
+    .evidence-copy h3 { margin:0 0 9px; font-size:24px; letter-spacing:-.04em; }
+    .evidence-copy > p { color:#67748a; margin:0 0 28px; max-width: 530px; }
+    .metric-bars { display:grid; gap: 16px; }
+    .bar-row { display:grid; grid-template-columns: 126px 1fr 54px; gap: 12px; align-items:center; font-size:12px; }
+    .bar-row label { color:#4d5b72; font-weight:700; }
+    .bar-track { height: 10px; border-radius:20px; background:#d3d0c7; overflow:hidden; }
+    .bar-fill { width:0; height:100%; border-radius:20px; background:linear-gradient(90deg, #6ccfc0, #b4ef7b); transition: width 1.2s cubic-bezier(.2,.75,.25,1); }
+    .bar-row small { text-align:right; color:#748098; font:700 11px ui-monospace,monospace; }
+    .chart-card { background:var(--paper); border:1px solid var(--line); border-radius: 18px; padding: 13px; }
+    .chart-card img { width:100%; image-rendering:auto; border-radius: 10px; }
+    .chart-caption { margin: 11px 2px 0; color:#748098; font-size:11px; line-height:1.4; }
+    .chart-card .metric-bars { padding: 16px 10px 4px; }
+    .scope { background: #f0eee5; }
+    .placed-table { margin-top: 40px; }
+    .placed-table + .placed-table { margin-top: 48px; }
+    .table-lead { margin: 0; max-width: 680px; color: #5e7189; font-size: 17px; line-height: 1.55; }
+    .paper-table-block { margin: 14px 0 0; }
+    .paper-table-block figcaption { margin: 0 0 10px; color: #71859c; font-size: 12px; font-weight: 750; letter-spacing: .04em; }
+    .paper-table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid rgba(23,52,90,.15); border-radius: 16px; background: rgba(255,255,255,.78); }
+    .paper-table { width: 100%; min-width: 720px; border-collapse: collapse; color: #17345a; font-size: 13.5px; }
+    .paper-table.wide { min-width: 920px; }
+    .paper-table th, .paper-table td { padding: 10px 12px; border-bottom: 1px solid rgba(23,52,90,.1); white-space: nowrap; vertical-align: middle; }
+    .paper-table thead th { font-size: 12px; font-weight: 750; letter-spacing: -.01em; text-align: right; background: rgba(23,52,90,.04); border-bottom-color: rgba(23,52,90,.18); }
+    .paper-table thead th.left, .paper-table tbody th, .paper-table td.cat { text-align: left; }
+    .paper-table thead th.center, .paper-table td.mark { text-align: center; }
+    .paper-table td.num { text-align: right; font-variant-numeric: tabular-nums; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; }
+    .paper-table td.mark { font-size: 15px; }
+    .paper-table td.mark.yes { color: #178f86; }
+    .paper-table td.mark.no { color: #8a7360; }
+    .paper-table .cite { color: #71859c; font-weight: 550; font-size: 12px; }
+    .paper-table tr.group th { text-align: left; font-size: 12px; font-weight: 750; color: #5d7390; background: rgba(23,52,90,.035); padding-top: 14px; }
+    .paper-table td.cat { color: #5d7390; font-size: 12px; font-weight: 700; }
+    .paper-table tr.wm td.cat { color: #17345a; }
+    .paper-table tr.wm th, .paper-table tr.wm td, .paper-table th.wm, .paper-table td.wm { background: rgba(84,203,187,.28); }
+    .paper-table tr.wm th, .paper-table th.wm { color: #17345a; }
+    .paper-table tbody tr:last-child th, .paper-table tbody tr:last-child td { border-bottom: 0; }
+    .gallery { background:#0f1a31; color:var(--white); }
+    .gallery .section-kicker { color:var(--orange); }
+    .gallery .section-title em { color:var(--orange); }
+    .gallery-layout { display:grid; grid-template-columns: 280px 1fr; gap: 46px; margin-top: 54px; align-items:start; }
+    .gallery-tabs { display:grid; gap: 10px; }
+    .gallery-tab { text-align:left; border:1px solid rgba(255,255,255,.16); background:transparent; color:#9aa8bf; border-radius: 14px; padding: 17px; cursor:pointer; transition:.2s; }
+    .gallery-tab:hover, .gallery-tab.is-active { color:var(--white); border-color:var(--orange); background:rgba(255,180,94,.1); }
+    .gallery-tab strong { display:block; font-size:15px; }
+    .gallery-tab span { display:block; margin-top: 5px; font-size:12px; line-height:1.4; }
+    .gallery-display { min-width:0; }
+    .gallery-display .art-frame { border-color:rgba(255,180,94,.35); }
+    .gallery-display img { aspect-ratio: 16 / 9; object-fit:contain; background:#f5f4ed; cursor:zoom-in; }
+    .gallery-display img.tall { aspect-ratio: 1.15 / 1; }
+    .gallery-meta { margin-top: 14px; display:flex; justify-content:space-between; gap:20px; color:#8998b1; font-size:12px; }
+    .citation { background: var(--ink); color: var(--white); padding-bottom: 105px; }
+    .citation-grid { margin-top:45px; display:grid; grid-template-columns: .9fr 1.1fr; gap:60px; align-items:start; }
+    .citation-copy { color:#aab5cb; font-size:16px; max-width:460px; }
+    .citation-copy a { color:var(--cyan); text-decoration:underline; text-underline-offset:3px; }
+    .bib { position:relative; background:#121e39; border:1px solid rgba(181,255,241,.22); border-radius:18px; padding:22px; font: 12px/1.65 ui-monospace, SFMono-Regular, Menlo, monospace; color:#c9d3e7; white-space:pre-wrap; }
+    .bib .copy { position:absolute; right:14px; top:14px; border:1px solid rgba(181,255,241,.28); background:rgba(113,225,208,.08); color:var(--cyan-2); border-radius:8px; padding:7px 9px; font-size:10px; cursor:pointer; }
+    .bib .copy.copied { color:var(--ink); background:var(--cyan); }
+    footer { padding:25px 28px; background:#070c18; color:#7e8ca7; font-size:11px; letter-spacing:.08em; text-transform:uppercase; }
+    .footer-inner { max-width:var(--max); margin:auto; display:flex; justify-content:space-between; gap:20px; }
+    .reveal { opacity:1; transform:translateY(22px); transition:opacity .65s ease, transform .65s ease; }
+    .reveal.visible { opacity:1; transform:none; }
+    .lightbox { position:fixed; inset:0; z-index:120; display:grid; place-items:center; padding:30px; background:rgba(3,6,16,.9); opacity:0; visibility:hidden; transition:.25s; }
+    .lightbox.open { opacity:1; visibility:visible; }
+    .lightbox img { max-width:min(1300px, 94vw); max-height:88vh; object-fit:contain; border:1px solid rgba(255,255,255,.35); border-radius:12px; background:#f5f4ed; }
+    .lightbox button { position:absolute; right:25px; top:20px; color:#fff; background:none; border:0; font-size:30px; cursor:pointer; }
+    @media (max-width: 940px) {
+      .hero { padding-top: 112px; }
+      .intro-grid, .method-intro, .evidence-grid, .citation-grid { grid-template-columns:1fr; gap:32px; }
+      .step-row { grid-template-columns: repeat(3,1fr); }
+      .gallery-layout { grid-template-columns:1fr; }
+      .gallery-tabs { grid-template-columns:repeat(2,1fr); }
+    }
+    @media (max-width: 640px) {
+      .nav-inner { padding: 14px 18px; }
+      .nav-links { position:absolute; top:62px; left:14px; right:14px; padding:15px; background:rgba(10,16,33,.97); border:1px solid rgba(181,255,241,.18); border-radius:16px; display:none; flex-direction:column; align-items:stretch; gap:14px; }
+      .nav-links.open { display:flex; }
+      .nav-action { text-align:center; }
+      .menu-btn { display:block; }
+      .hero, .section { padding-left:18px; padding-right:18px; }
+      .hero { min-height: 100svh; padding: 108px 18px 72px; }
+      .paper-title { margin-top: 14px; }
+      .hero-cta { margin-top: 22px; }
+      .section { padding-top: 54px; padding-bottom: 54px; }
+      .signal-inner { display:block; }
+      .signal-inner > span { display:block; margin-top:6px; }
+      .why-grid, .metric-strip { grid-template-columns:1fr; }
+      .step-row { grid-template-columns:repeat(2,1fr); }
+      .loop-detail { grid-template-columns: 55px 1fr; }
+      .detail-tag { grid-column:2; justify-self:start; }
+      .bar-row { grid-template-columns: 93px 1fr 43px; gap:8px; }
+      .gallery-tabs { grid-template-columns:1fr; }
+      .gallery-meta, .footer-inner { flex-direction:column; }
+      footer { padding-left:18px; padding-right:18px; }
+    }
+  </style>
+
+  <style id="bright-theme">
+    :root {
+      --ink: #17345a;
+      --ink-2: #26466d;
+      --paper: #fbfaf6;
+      --paper-2: #f0f3ec;
+      --muted: #6e8097;
+      --line: rgba(23, 52, 90, .15);
+      --cyan: #54cbbb;
+      --cyan-2: #177f83;
+      --orange: #f2ad62;
+      --pink: #efb2bd;
+      --lime: #cbe675;
+      --white: #17345a;
+      --shadow: 0 18px 60px rgba(23, 52, 90, .14);
+    }
+    body { background: var(--paper); color: var(--ink); }
+    .site-nav { color: var(--ink); background: transparent; border-bottom-color: transparent; }
+    .site-nav.scrolled { background: rgba(251,250,246,.9); box-shadow: 0 8px 28px rgba(23,52,90,.1); }
+    .brand { color: var(--ink); }
+    .brand small { color: #71859c; }
+    .nav-links { color: #5d7390; }
+    .nav-links a:hover, .nav-links a.active { color: var(--cyan-2); }
+    .nav-action { color: var(--cyan-2); border-color: rgba(23,127,131,.35); background: rgba(84,203,187,.12); }
+    .menu-btn { color: var(--ink); }
+    .hero { color: var(--ink); background: #f3efe6; }
+    .eyebrow { color: var(--cyan-2); }
+    .btn-primary { background: var(--cyan); color: var(--ink); }
+    .btn-secondary { color: var(--ink); border-color: rgba(23,52,90,.23); background: rgba(255,255,255,.58); }
+    .btn-secondary:hover { background: #fff; }
+    .signal { background: #dff3eb; color: var(--ink); }
+    .signal-flow i { background: var(--cyan-2); }
+    .why-card { background: rgba(255,255,255,.68); border-top-color: var(--ink); }
+    .why-card:hover { background: #fff; }
+    .dark-section { background: #e7f2ed; color: var(--ink); }
+    .dark-section .section-kicker { color: #238b81; }
+    .dark-section .section-title em { color: #238b81; }
+    .method-copy { color: #5e7189; }
+    .art-frame { border-color: rgba(23,127,131,.24); background: rgba(255,255,255,.72); }
+    .art-caption { color: #71859c; }
+    .step { border-color: rgba(23,127,131,.22); color: #667b92; }
+    .step:hover, .step.is-active { border-color: #238b81; background: rgba(84,203,187,.14); color: var(--ink); }
+    .step strong { color: #238b81; }
+    .loop-detail { border-color: rgba(23,127,131,.26); }
+    .detail-index { color: rgba(23,127,131,.45); }
+    .detail-copy span { color: #667b92; }
+    .detail-tag { background: var(--orange); }
+    .fidelity { background: #f0eee5; }
+    .metric-card { background: rgba(255,255,255,.68); }
+    .gallery { background: #f2eee5; color: var(--ink); }
+    .gallery .section-kicker { color: #b86a1d; }
+    .gallery .section-title em { color: #b86a1d; }
+    .gallery-tab { border-color: rgba(23,52,90,.16); color: #667b92; background: rgba(255,255,255,.55); }
+    .gallery-tab:hover, .gallery-tab.is-active { color: var(--ink); border-color: #e49a4a; background: rgba(242,173,98,.14); }
+    .gallery-display .art-frame { border-color: rgba(228,154,74,.35); }
+    .gallery-meta { color: #71859c; }
+    .citation { background: #e5f1ed; color: var(--ink); }
+    .citation-copy { color: #5e7189; }
+    .citation-copy a { color: #177f83; }
+    .bib { background: rgba(255,255,255,.76); border-color: rgba(23,127,131,.24); color: #425b78; }
+    .bib .copy { color: #177f83; border-color: rgba(23,127,131,.28); background: rgba(84,203,187,.12); }
+    .bib .copy.copied { color: var(--ink); background: var(--cyan); }
+    footer { background: #e8e8df; color: #687b92; }
+    @media (max-width: 640px) { .nav-links { background: rgba(251,250,246,.98); border-color: rgba(23,127,131,.2); } }
+  </style>
+
+  <style id="demo-styles">
+    .demos { background: #fbfaf6; }
+    .demo-lead { max-width: 680px; margin: 18px 0 0; color: #5e7189; font-size: 17px; }
+    .scene-switch { margin-top: 32px; display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; }
+    .scene-tab { flex: 0 0 auto; border: 1px solid rgba(23,52,90,.16); background: rgba(255,255,255,.72); color: #5d7390; border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 750; cursor: pointer; }
+    .scene-tab.is-active, .scene-tab:hover { color: #17345a; border-color: #178f86; background: rgba(84,203,187,.18); }
+    .compare { margin-top: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .compare-col { min-width: 0; border: 1px solid rgba(23,52,90,.12); border-radius: 20px; background: rgba(255,255,255,.76); padding: 14px; }
+    .compare-col h3 { margin: 2px 4px 12px; font-size: 16px; letter-spacing: -.03em; }
+    .compare-col h3 span { display: block; margin-top: 3px; color: #71859c; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .shot { margin: 12px 0 0; }
+    .shot video { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; border-radius: 12px; background: #d7e2dc; }
+    .shot figcaption { margin-top: 6px; color: #71859c; font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    .demo-foot { margin-top: 16px; display: flex; justify-content: space-between; gap: 16px; align-items: center; }
+    .scene-caption { margin: 0; color: #5e7189; font-size: 14px; line-height: 1.5; }
+    .method-board { margin-top: 22px; display: grid; grid-template-columns: repeat(5, minmax(200px, 1fr)); gap: 12px; overflow-x: auto; padding-bottom: 8px; }
+    .method-card { min-width: 200px; border: 1px solid rgba(23,52,90,.12); border-radius: 18px; background: rgba(255,255,255,.78); padding: 12px; }
+    .method-card.is-ours { border-color: rgba(23,143,134,.55); }
+    .method-card h3 { margin: 2px 4px 8px; font-size: 15px; letter-spacing: -.03em; }
+    .method-card img, .method-card video, .clip-missing { width: 100%; aspect-ratio: 16 / 9; object-fit: contain; border-radius: 10px; background: #e4eeea; display: block; }
+    .method-card img { cursor: zoom-in; }
+    .clip-missing { display: grid; place-items: center; color: #71859c; font-size: 12px; font-weight: 750; letter-spacing: .04em; text-align: center; padding: 8px; }
+    .clip-missing[hidden], .method-card video[hidden] { display: none; }
+    .splat-stage { position: relative; height: min(78vh, 820px); margin-top: 28px; border-radius: 22px; overflow: hidden; background: #dfe8e4; border: 1px solid rgba(23,52,90,.12); }
+    .splat-stage canvas { display: block; }
+    .splat-status { position: absolute; left: 16px; bottom: 14px; z-index: 2; margin: 0; padding: 8px 12px; border-radius: 999px; background: rgba(251,250,246,.88); color: #17345a; font-size: 12px; font-weight: 750; pointer-events: none; }
+    @media (max-width: 640px) {
+      .compare { gap: 10px; }
+      .compare-col { padding: 8px; border-radius: 14px; }
+      .compare-col h3 { font-size: 13px; margin-bottom: 8px; }
+      .shot video { border-radius: 8px; }
+      .demo-foot { flex-direction: column; align-items: stretch; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <header class="site-nav" id="siteNav">
+    <div class="nav-inner">
+      <a class="brand" href="#top" aria-label="WorldMirror home"><span class="brand-mark"><img src="logo.png" alt="" width="34" height="34"></span><span>WorldMirror<small>Real-to-Sim research</small></span></a>
+      <button class="menu-btn" id="menuBtn" aria-label="Open navigation">☰</button>
+      <nav class="nav-links" id="navLinks" aria-label="Primary navigation">
+        <a href="#story">Overview</a><a href="#method">Method</a><a href="#replay">Replay</a><a href="#scene3d">Scene</a><a href="#baselines">Compare</a><a href="#evidence">Evidence</a><a href="#gallery">Qualitative</a><a class="nav-action" href="#citation">Cite this work</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-bg" aria-hidden="true">
+        <video class="is-active is-front" src="%E9%A3%9E%E4%B9%A620261012-120412.mp4" autoplay muted playsinline preload="auto"></video>
+        <video src="%E9%A3%9E%E4%B9%A620261012-173756.mp4" autoplay muted playsinline preload="auto"></video>
+      </div>
+      <div class="hero-inner">
+        <h1 id="hero-title"><span class="project-name">World<em>Mirror</em></span><span class="paper-title">Agentic Real-to-Sim Generation of Interactive Worlds from In-the-Wild Robot Demonstrations</span></h1>
+        <p class="authors"></p>
+        <div class="hero-cta"><a class="btn btn-primary" href="_ICLR_27_WorldMirror__Refine_ver.pdf" target="_blank" rel="noopener">Paper</a><a class="btn btn-secondary" href="#replay">Replay</a></div>
+      </div>
+    </section>
+    <div class="signal"><div class="signal-inner"><div class="signal-flow"><span>RGB video</span><i></i><span>World program</span><i></i><span>Interactive twin</span><i></i><span>Trajectory replay</span></div><span>One shared camera-anchored frame</span></div></div>
+
+    <section class="section" id="story">
+      <div class="section-inner">
+        <div class="overview-head reveal"><div class="section-kicker">Overview</div><h2 class="section-title">Interactive worlds from in-the-wild demonstrations.</h2></div>
+        <figure class="story-teaser reveal">
+          <div class="art-frame"><img class="zoomable" src="teaser-v3.png" width="4800" height="2879" alt="GPT-6 Astra and WorldMirror on spatial structure, visual fidelity, and physical consistency. Astra keeps the layout and fails appearance and contact. WorldMirror holds all three." /></div>
+        </figure>
+        <div class="story-abstract reveal">
+          <p>WorldMirror turns in-the-wild demonstrations into interactive twins by iteratively refining an executable world program. A camera-pose-anchored scene lets the recorded trajectory replay unchanged.</p>
+        </div>
+        <div class="why-grid"><article class="why-card reveal"><span class="why-num">01 / APPEARANCE</span><h3>See the scene.</h3><p>Recover the visual context of the observed environment with a high-fidelity static reconstruction.</p></article><article class="why-card reveal"><span class="why-num">02 / STRUCTURE</span><h3>Place the parts.</h3><p>Represent task-relevant objects as editable assets with poses, geometry, and interaction semantics.</p></article><article class="why-card reveal"><span class="why-num">03 / EXECUTION</span><h3>Replay the motion.</h3><p>Anchor the scene, objects, and robot to one camera-pose frame so the original trajectory can run unchanged.</p></article></div>
+      </div>
+    </section>
+
+    <section class="section dark-section" id="method">
+      <div class="section-inner">
+        <div class="method-intro reveal"><div><div class="section-kicker">01 · Method</div><h2 class="section-title">An agent that <em>builds, checks,</em> and builds again.</h2></div><p class="method-copy">Instead of a fixed pipeline, a router agent maintains a structured world state, delegates to specialized tools, and uses verification feedback to decide what to revisit next.</p></div>
+        <div class="method-art reveal"><div class="art-frame"><img src="framework.png" alt="WorldMirror framework diagram showing the agentic real-to-sim reconstruction loop" /></div></div>
+        <div class="step-row reveal" role="tablist" aria-label="WorldMirror construction steps"><button class="step is-active" data-step="0"><strong>00</strong><b>Read demonstration</b></button><button class="step" data-step="1"><strong>01</strong><b>Decompose scene</b></button><button class="step" data-step="2"><strong>02</strong><b>Generate assets</b></button><button class="step" data-step="3"><strong>03</strong><b>Calibrate camera</b></button><button class="step" data-step="4"><strong>04</strong><b>Assemble world</b></button><button class="step" data-step="5"><strong>05</strong><b>Probe &amp; validate</b></button></div>
+        <div class="loop-detail reveal" aria-live="polite"><div class="detail-index">00</div><div class="detail-copy"><strong>Read the demonstration</strong><span>Ground the world state in the observed scene, instruction, and robot trajectory.</span></div><div class="detail-tag">Observe</div></div>
+      </div>
+    </section>
+
+    <section class="section scope" id="scope">
+      <div class="section-inner">
+        <div class="reveal">
+          <div class="section-kicker">Scope</div>
+          <h2 class="section-title">More than a <em>renderer.</em></h2>
+          <p class="demo-lead">WorldMirror is not only a renderer; the checkmarks show which real-to-sim systems actually replay a demonstration and close the loop.</p>
+        </div>
+        <figure class="paper-table-block reveal">
+          <figcaption>Table 1</figcaption>
+          <div class="paper-table-scroll" tabindex="0">
+            <table class="paper-table wide">
+              <thead>
+                <tr>
+                  <th scope="col" class="left">Capability</th>
+                  <th scope="col" class="center">RoLA</th>
+                  <th scope="col" class="center">RoboSnap</th>
+                  <th scope="col" class="center">SimFoundry</th>
+                  <th scope="col" class="center">SAGE</th>
+                  <th scope="col" class="center">Astra</th>
+                  <th scope="col" class="center">Agentic Real2Sim</th>
+                  <th scope="col" class="center wm">WorldMirror</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="group"><th colspan="8">Scene Reconstruction</th></tr>
+                <tr>
+                  <th scope="row">Scene Appearance</th>
+                  <td class="mark yes" aria-label="Yes">✓</td>
+                  <td class="mark yes" aria-label="Yes">✓</td>
+                  <td class="mark yes" aria-label="Yes">✓</td>
+                  <td class="mark yes" aria-label="Yes">✓</td>
+                  <td class="mark no" aria-label="No">✗</td>
+                  <td class="mark no" aria-label="No">✗</td>
+                  <td class="mark yes wm" aria-label="Yes">✓</td>
+                </tr>
+                <tr>
+                  <th scope="row">Interactive Assets</th>
+                  <td class="mark yes" aria-label="Yes">✓</td>
+                  <td class="mark yes" aria-label="Yes">✓</td>
+                  <td class="mark yes" aria-label="Yes">✓</td>
+                  <td class="mark yes" aria-label="Yes">✓</td>
+                  <td class="mark yes" aria-label="Yes">✓</td>
+                  <td class="mark yes" aria-label="Yes">✓</td>
+                  <td class="mark yes wm" aria-label="Yes">✓</td>
+                </tr>
+                <tr class="group"><th colspan="8">Robot–World Alignment</th></tr>
+                <tr>
+                  <th scope="row">Camera Calibration</th>
+                  <td class="mark no" aria-label="No">✗</td>
+                  <td class="mark yes" aria-label="Yes">✓</td>
+                  <td class="mark yes" aria-label="Yes">✓</td>
+                  <td class="mark no" aria-label="No">✗</td>
+                  <td class="mark yes" aria-label="Yes">✓</td>
+                  <td class="mark yes" aria-label="Yes">✓</td>
+                  <td class="mark yes wm" aria-label="Yes">✓</td>
+                </tr>
+                <tr>
+                  <th scope="row">Demonstration Replay</th>
+                  <td class="mark no" aria-label="No">✗</td>
+                  <td class="mark yes" aria-label="Yes">✓</td>
+                  <td class="mark no" aria-label="No">✗</td>
+                  <td class="mark no" aria-label="No">✗</td>
+                  <td class="mark yes" aria-label="Yes">✓</td>
+                  <td class="mark yes" aria-label="Yes">✓</td>
+                  <td class="mark yes wm" aria-label="Yes">✓</td>
+                </tr>
+                <tr class="group"><th colspan="8">Agentic Construction</th></tr>
+                <tr>
+                  <th scope="row">Tool Orchestration</th>
+                  <td class="mark no" aria-label="No">✗</td>
+                  <td class="mark no" aria-label="No">✗</td>
+                  <td class="mark no" aria-label="No">✗</td>
+                  <td class="mark yes" aria-label="Yes">✓</td>
+                  <td class="mark yes" aria-label="Yes">✓</td>
+                  <td class="mark yes" aria-label="Yes">✓</td>
+                  <td class="mark yes wm" aria-label="Yes">✓</td>
+                </tr>
+                <tr>
+                  <th scope="row">Agent-based Verification</th>
+                  <td class="mark no" aria-label="No">✗</td>
+                  <td class="mark no" aria-label="No">✗</td>
+                  <td class="mark no" aria-label="No">✗</td>
+                  <td class="mark yes" aria-label="Yes">✓</td>
+                  <td class="mark yes" aria-label="Yes">✓</td>
+                  <td class="mark yes" aria-label="Yes">✓</td>
+                  <td class="mark yes wm" aria-label="Yes">✓</td>
+                </tr>
+                <tr>
+                  <th scope="row">Feedback-guided Refinement</th>
+                  <td class="mark no" aria-label="No">✗</td>
+                  <td class="mark yes" aria-label="Yes">✓</td>
+                  <td class="mark yes" aria-label="Yes">✓</td>
+                  <td class="mark yes" aria-label="Yes">✓</td>
+                  <td class="mark yes" aria-label="Yes">✓</td>
+                  <td class="mark yes" aria-label="Yes">✓</td>
+                  <td class="mark yes wm" aria-label="Yes">✓</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section demos" id="replay">
+      <div class="section-inner">
+        <div class="reveal"><div class="section-kicker">Replay</div><h2 class="section-title">The same trajectory, <em>in the mirror.</em></h2><p class="demo-lead">Ten DROID demonstrations. Each one pairs the real exterior and wrist views with the WorldMirror replay of that trajectory.</p></div>
+        <div class="scene-switch" id="sceneSwitch" role="tablist" aria-label="Replay scenes"></div>
+        <div class="compare">
+          <div class="compare-col">
+            <h3>Real demonstration<span>Recorded DROID views</span></h3>
+            <figure class="shot"><video id="realExt" autoplay muted playsinline loop controls preload="auto" aria-label="Real exterior camera"></video></figure>
+            <figure class="shot"><video id="realWrist" autoplay muted playsinline loop controls preload="auto" aria-label="Real wrist camera"></video></figure>
+          </div>
+          <div class="compare-col">
+            <h3>WorldMirror replay<span>Same trajectory, no retargeting</span></h3>
+            <figure class="shot"><video id="simExt" autoplay muted playsinline loop controls preload="auto" aria-label="Replayed exterior camera"></video></figure>
+            <figure class="shot"><video id="simWrist" autoplay muted playsinline loop controls preload="auto" aria-label="Replayed wrist camera"></video></figure>
+          </div>
+        </div>
+        <div class="demo-foot"><p class="scene-caption" id="sceneCaption"></p></div>
+      </div>
+    </section>
+
+    <section class="section" id="scene3d">
+      <div class="section-inner">
+        <div class="reveal"><div class="section-kicker">Scene</div><h2 class="section-title">Turn the reconstructed <em>world.</em></h2><p class="demo-lead">The room is the reconstructed scene. The fork, cutlery holder, and arm are the solid models from the same file. Drag to orbit the full circle, and scroll to move closer.</p></div>
+        <div class="splat-stage" id="splatStage"><p class="splat-status" id="splatStatus">Loading the scene…</p></div>
+      </div>
+    </section>
+
+    <section class="section baselines" id="baselines">
+      <div class="section-inner">
+        <div class="reveal"><div class="section-kicker">Comparison</div><h2 class="section-title">The same scene, <em>five ways.</em></h2><p class="demo-lead">The exterior camera, in the paper’s order. Every method has a first frame. A replay plays underneath only when that method has a clip. Wrist views stay in the section above, where the real demonstration and the WorldMirror replay are paired.</p></div>
+        <div class="scene-switch" id="baseSwitch" role="tablist" aria-label="Comparison scenes"></div>
+        <div class="method-board" id="baseBoard">
+          <article class="method-card"><h3>Real</h3><figure class="shot"><img class="zoomable" data-still="gt" alt=""></figure><figure class="shot"><video data-video="gt" autoplay muted playsinline loop controls preload="auto" aria-label="Real clip"></video><div class="clip-missing" data-empty="gt" hidden>No replay clip</div></figure></article>
+          <article class="method-card"><h3>RoboSnap</h3><figure class="shot"><img class="zoomable" data-still="robosnap" alt=""></figure><figure class="shot"><video data-video="robosnap" autoplay muted playsinline loop controls preload="auto" aria-label="RoboSnap replay" hidden></video><div class="clip-missing" data-empty="robosnap">No replay clip</div></figure></article>
+          <article class="method-card"><h3>RoLA</h3><figure class="shot"><img class="zoomable" data-still="rola" alt=""></figure><figure class="shot"><video data-video="rola" autoplay muted playsinline loop controls preload="auto" aria-label="RoLA replay"></video><div class="clip-missing" data-empty="rola" hidden>No replay clip</div></figure></article>
+          <article class="method-card"><h3>GPT-6 Astra</h3><figure class="shot"><img class="zoomable" data-still="gpt6" alt=""></figure><figure class="shot"><video data-video="gpt6" autoplay muted playsinline loop controls preload="auto" aria-label="GPT-6 Astra replay"></video><div class="clip-missing" data-empty="gpt6" hidden>No replay clip</div></figure></article>
+          <article class="method-card is-ours"><h3>WorldMirror</h3><figure class="shot"><img class="zoomable" data-still="ours" alt=""></figure><figure class="shot"><video data-video="ours" autoplay muted playsinline loop controls preload="auto" aria-label="WorldMirror replay"></video><div class="clip-missing" data-empty="ours" hidden>No replay clip</div></figure></article>
+        </div>
+        <div class="demo-foot"><p class="scene-caption" id="baseCaption"></p></div>
+      </div>
+    </section>
+
+    <section class="section fidelity" id="evidence">
+      <div class="section-inner">
+        <div class="reveal"><div class="section-kicker">02 · Evidence</div><h2 class="section-title">Fidelity is a <em>three-part contract.</em></h2></div>
+        <div class="metric-strip"><article class="metric-card cyan reveal"><span>Motion replay</span><strong>1.79 cm</strong><p>Displacement error when the recorded trajectory is replayed in Isaac Sim.</p></article><article class="metric-card orange reveal"><span>Physical interaction</span><strong>0.873</strong><p>Contact F1 during that same replay.</p></article><article class="metric-card lime reveal"><span>Replay success</span><strong>100%</strong><p>Recorded trajectories that complete in simulation, without retargeting.</p></article></div>
+        <div class="evidence-grid"><div class="evidence-copy reveal"><h3>The recorded motion still fits the reconstructed world.</h3><p>The comparison is trajectory replay in Isaac Sim, not a real-robot policy evaluation. Lower displacement error means the replay stays closer to the demonstration.</p></div><div class="chart-card reveal"><div class="metric-bars"><div class="bar-row"><label>WorldMirror</label><div class="bar-track"><div class="bar-fill" data-width="94%"></div></div><small>1.79</small></div><div class="bar-row"><label>GPT-6 Astra</label><div class="bar-track"><div class="bar-fill" data-width="48%"></div></div><small>11.17</small></div><div class="bar-row"><label>RoLA</label><div class="bar-track"><div class="bar-fill" data-width="18%"></div></div><small>24.70</small></div></div><p class="chart-caption">Displacement error in centimeters. Longer bars correspond to lower error.</p></div></div>
+        <div class="placed-table reveal" id="motion-replay">
+          <p class="table-lead">The cards above are the headline of this table: trajectory replay in Isaac Sim, not a real-robot policy result.</p>
+          <figure class="paper-table-block">
+            <figcaption>Table 4</figcaption>
+            <div class="paper-table-scroll" tabindex="0">
+              <table class="paper-table">
+                <thead>
+                  <tr>
+                    <th scope="col" class="left" rowspan="2">Method</th>
+                    <th scope="colgroup" class="center" colspan="4">Motion Replay</th>
+                    <th scope="colgroup" class="center" colspan="2">Physical Interaction</th>
+                  </tr>
+                  <tr>
+                    <th scope="col">Disp. (cm)↓</th>
+                    <th scope="col">Final (cm)↓</th>
+                    <th scope="col">Dir. (°)↓</th>
+                    <th scope="col">DTW (cm)↓</th>
+                    <th scope="col">F1↑</th>
+                    <th scope="col">SR↑</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">RoLA <span class="cite">(Zhao et al., 2025)</span></th>
+                    <td class="num">24.70</td>
+                    <td class="num">40.80</td>
+                    <td class="num">53.00</td>
+                    <td class="num">10.30</td>
+                    <td class="num">–</td>
+                    <td class="num">–</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">GPT-6 Astra <span class="cite">(OpenAI, 2026)</span></th>
+                    <td class="num">11.17</td>
+                    <td class="num">21.98</td>
+                    <td class="num">81.30</td>
+                    <td class="num">10.82</td>
+                    <td class="num">0.653</td>
+                    <td class="num">40%</td>
+                  </tr>
+                  <tr class="wm">
+                    <th scope="row">WorldMirror</th>
+                    <td class="num">1.79</td>
+                    <td class="num">5.83</td>
+                    <td class="num">10.90</td>
+                    <td class="num">1.64</td>
+                    <td class="num">0.873</td>
+                    <td class="num">100%</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="section gallery" id="gallery">
+      <div class="section-inner">
+        <div class="reveal"><div class="section-kicker">03 · Qualitative results</div><h2 class="section-title">The mirror should hold up <em>frame by frame.</em></h2></div>
+        <div class="placed-table reveal" id="appearance">
+          <p class="table-lead">Appearance is measured on the same ten exterior views.</p>
+          <figure class="paper-table-block">
+            <figcaption>Table 2</figcaption>
+            <div class="paper-table-scroll" tabindex="0">
+              <table class="paper-table">
+                <thead>
+                  <tr>
+                    <th scope="col" class="left">Type</th>
+                    <th scope="col" class="left">Method</th>
+                    <th scope="col">PSNR ↑</th>
+                    <th scope="col">SSIM ↑</th>
+                    <th scope="col">LPIPS ↓</th>
+                    <th scope="col">DISTS ↓</th>
+                    <th scope="col">Aesthetic ↑</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="cat" rowspan="2">Open-source</td>
+                    <th scope="row">RoLA <span class="cite">(Zhao et al., 2025)</span></th>
+                    <td class="num">13.53</td>
+                    <td class="num">0.587</td>
+                    <td class="num">0.506</td>
+                    <td class="num">0.206</td>
+                    <td class="num">0.480</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">RoboSnap <span class="cite">(Zhang et al., 2026)</span></th>
+                    <td class="num">10.30</td>
+                    <td class="num">0.483</td>
+                    <td class="num">0.641</td>
+                    <td class="num">0.209</td>
+                    <td class="num">0.532</td>
+                  </tr>
+                  <tr>
+                    <td class="cat">Proprietary</td>
+                    <th scope="row">GPT-6 Astra</th>
+                    <td class="num">11.90</td>
+                    <td class="num">0.515</td>
+                    <td class="num">0.606</td>
+                    <td class="num">0.299</td>
+                    <td class="num">0.472</td>
+                  </tr>
+                  <tr class="wm">
+                    <td class="cat">Ours</td>
+                    <th scope="row">WorldMirror</th>
+                    <td class="num">13.57</td>
+                    <td class="num">0.570</td>
+                    <td class="num">0.427</td>
+                    <td class="num">0.168</td>
+                    <td class="num">0.570</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </figure>
+        </div>
+        <div class="placed-table reveal" id="layout">
+          <p class="table-lead">Layout is a separate contract from pixels: WorldMirror is best on relative distance, and GPT-6 Astra is better on IoU and position error.</p>
+          <figure class="paper-table-block">
+            <figcaption>Table 3</figcaption>
+            <div class="paper-table-scroll" tabindex="0">
+              <table class="paper-table">
+                <thead>
+                  <tr>
+                    <th scope="col" class="left">Category</th>
+                    <th scope="col" class="left">Method</th>
+                    <th scope="col">IoU ↑</th>
+                    <th scope="col">Pos. Err. ↓</th>
+                    <th scope="col">Rel. Vec. ↓</th>
+                    <th scope="col">Rel. Dist. ↓</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="cat" rowspan="3">Open-source</td>
+                    <th scope="row">RoLA <span class="cite">(Zhao et al., 2025)</span></th>
+                    <td class="num">0.232</td>
+                    <td class="num">30.65</td>
+                    <td class="num">0.814</td>
+                    <td class="num">0.542</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">RoboSnap <span class="cite">(Zhang et al., 2026)</span></th>
+                    <td class="num">0.313</td>
+                    <td class="num">27.79</td>
+                    <td class="num">0.644</td>
+                    <td class="num">0.583</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">SimFoundry <span class="cite">(Ranawaka et al., 2026)</span></th>
+                    <td class="num">0.169</td>
+                    <td class="num">19.54</td>
+                    <td class="num">0.627</td>
+                    <td class="num">0.507</td>
+                  </tr>
+                  <tr>
+                    <td class="cat">Proprietary</td>
+                    <th scope="row">GPT-6 Astra <span class="cite">(OpenAI, 2026)</span></th>
+                    <td class="num">0.598</td>
+                    <td class="num">8.72</td>
+                    <td class="num">0.552</td>
+                    <td class="num">0.331</td>
+                  </tr>
+                  <tr class="wm">
+                    <td class="cat">Ours</td>
+                    <th scope="row">WorldMirror</th>
+                    <td class="num">0.469</td>
+                    <td class="num">9.66</td>
+                    <td class="num">0.557</td>
+                    <td class="num">0.219</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </figure>
+        </div>
+        <div class="gallery-layout"><div class="gallery-tabs reveal"><button class="gallery-tab is-active" data-image="4scene_methods.png" data-alt="Four scene comparisons across GT, RoboSnap, RoLA, GPT-6 Astra, and WorldMirror" data-tall="false"><strong>Scene fidelity</strong><span>Real appearance, layout, and object placement.</span></button><button class="gallery-tab" data-image="wrist_timeline.png" data-alt="Wrist-view timeline comparison for rigid, separable, and articulated objects" data-tall="true"><strong>Trajectory replay</strong><span>Correspondence over time, from first frame to completion.</span></button></div><div class="gallery-display reveal"><div class="art-frame"><img id="galleryImage" class="zoomable" src="4scene_methods.png" alt="Four scene comparisons across GT, RoboSnap, RoLA, GPT-6 Astra, and WorldMirror" /></div></div></div>
+      </div>
+    </section>
+
+    <section class="section citation" id="citation">
+      <div class="section-inner"><div class="section-kicker reveal" style="color:var(--cyan)">05 · Citation</div><div class="citation-grid"><div class="reveal"><h2 class="section-title">Build on the <em>mirror.</em></h2><p class="citation-copy">Use the title and BibTeX below when you want to reference the WorldMirror project. The paper PDF is available for a closer look at the method and experiments.</p><p class="citation-copy"><a href="_ICLR_27_WorldMirror__Refine_ver.pdf" target="_blank" rel="noopener">Download the full paper ↗</a></p></div><div class="bib reveal"><button class="copy" id="copyBib">Copy BibTeX</button><code id="bibText">@article{worldmirror,
+  title={WorldMirror: Agentic Real-to-Sim Generation of Interactive Worlds from In-the-Wild Robot Demonstrations},
+  author={Anonymous authors}
+}</code></div></div></div>
+    </section>
+  </main>
+  <footer><div class="footer-inner"><span>WorldMirror · Agentic Real-to-Sim</span><span>Designed for GitHub Pages · static HTML</span></div></footer>
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Expanded figure"><button id="closeLightbox" aria-label="Close image">×</button><img id="lightboxImage" alt="" /></div>
+
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js" } }
+  </script>
+  <script>
+    if (location.protocol === "file:") {
+      const status = document.getElementById("splatStatus");
+      if (status) status.textContent = "Open this page through a local server. A file:// address cannot load the 3D scene.";
+    }
+  </script>
+  <script type="module">
+    import * as THREE from "three";
+    import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/loaders/GLTFLoader.js";
+    import * as GaussianSplats3D from "./scene/gaussian-splats-3d.module.js";
+    const stage = document.getElementById("splatStage");
+    const status = document.getElementById("splatStatus");
+    if (location.protocol === "file:") {
+      status.textContent = "Open this page through a local server. A file:// address cannot load the 3D scene.";
+    } else {
+    const lookAt = [0.12, 1.02, 0.05];
+    const eye = [2.15, 1.72, 2.25];
+    const requestedScene = new URLSearchParams(location.search).get('scene');
+    const sceneFiles = {
+      faithful: 'scene/room-faithful.ply',
+      room2: 'scene/room2.ply',
+      room3: 'scene/room3.ply',
+      room4: 'scene/room4.ply',
+      room5: 'scene/room5.ply',
+      room6: 'scene/room6.ply'
+    };
+    const splatPath = sceneFiles[requestedScene] || sceneFiles.faithful;
+    const viewer = new GaussianSplats3D.Viewer({
+      rootElement: stage,
+      cameraUp: [0, 1, 0],
+      initialCameraPosition: eye,
+      initialCameraLookAt: lookAt,
+      sphericalHarmonicsDegree: 0,
+      sharedMemoryForWorkers: false,
+      gpuAcceleratedSort: false,
+      antialiased: false,
+      kernel2DSize: 0.3,
+      maxScreenSpaceSplatSize: 256,
+      sceneRevealMode: GaussianSplats3D.SceneRevealMode.Instant,
+      selfDrivenMode: true,
+      useBuiltInControls: true
+    });
+    const unlock = (controls) => {
+      if (!controls) return;
+      controls.minPolarAngle = 0;
+      controls.maxPolarAngle = Math.PI;
+      controls.minAzimuthAngle = -Infinity;
+      controls.maxAzimuthAngle = Infinity;
+      controls.enableRotate = true;
+      controls.enablePan = true;
+      controls.enableZoom = true;
+      controls.enableDamping = true;
+    };
+    const frameScene = () => {
+      unlock(viewer.controls);
+      unlock(viewer.perspectiveControls);
+      unlock(viewer.orthographicControls);
+      if (viewer.camera) {
+        viewer.camera.up.set(0, 1, 0);
+        viewer.camera.position.set(eye[0], eye[1], eye[2]);
+      }
+      const seen = new Set();
+      for (const controls of [viewer.controls, viewer.perspectiveControls, viewer.orthographicControls]) {
+        if (!controls || seen.has(controls)) continue;
+        seen.add(controls);
+        controls.target.set(lookAt[0], lookAt[1], lookAt[2]);
+        controls.update();
+      }
+    };
+    frameScene();
+    const hemi = new THREE.HemisphereLight(0xfff8f0, 0x8aa0b8, 1.15);
+    const sun = new THREE.DirectionalLight(0xffffff, 1.6);
+    sun.position.set(2.4, 4.2, 2.2);
+    const fill = new THREE.DirectionalLight(0xdfe7ff, 0.55);
+    fill.position.set(-2.2, 2.4, -1.6);
+    viewer.threeScene.add(hemi, sun, fill);
+    const props = new GLTFLoader().loadAsync("scene/props-pbr.glb").then((gltf) => {
+      gltf.scene.traverse((obj) => {
+        if (!obj.isMesh) return;
+        if (!obj.geometry.getAttribute("normal")) obj.geometry.computeVertexNormals();
+        obj.renderOrder = 1;
+      });
+      viewer.threeScene.add(gltf.scene);
+    });
+    Promise.resolve(viewer.addSplatScene(splatPath, {
+      showLoadingUI: false,
+      progressiveLoad: false,
+      splatAlphaRemovalThreshold: 1
+    })).then(() => props).then(() => {
+      frameScene();
+      viewer.start();
+      viewer.splatMesh.frustumCulled = false;
+      requestAnimationFrame(frameScene);
+      status.textContent = "Drag to orbit · scroll to zoom · right-drag to pan";
+    }).catch((error) => {
+      status.textContent = "The scene could not be loaded. " + (error && error.message ? error.message : "");
+      console.error(error);
+    });
+    }
+  </script>
+  <script>
+    const heroVideos = [...document.querySelectorAll('.hero-bg video')];
+    if (heroVideos.length) {
+      let active = 0;
+      const slowHero = (video) => { video.defaultPlaybackRate = 0.7; video.playbackRate = 0.7; };
+      const playHero = (index) => {
+        const incoming = heroVideos[index];
+        const outgoing = heroVideos[active];
+        const reveal = () => {
+          slowHero(incoming);
+          if (outgoing !== incoming) outgoing.classList.remove('is-front');
+          if (incoming.classList.contains('is-active')) {
+            incoming.classList.remove('is-active');
+            void incoming.offsetWidth;
+          }
+          incoming.classList.add('is-front', 'is-active');
+          active = index;
+          incoming.play().catch(() => {});
+          if (outgoing !== incoming) {
+            window.setTimeout(() => {
+              if (!outgoing.classList.contains('is-front')) outgoing.classList.remove('is-active');
+            }, 450);
+          }
+        };
+        const fromStart = () => {
+          slowHero(incoming);
+          if (incoming.currentTime <= 0.01) { reveal(); return; }
+          let started = false;
+          const go = () => { if (started) return; started = true; reveal(); };
+          incoming.addEventListener('seeked', go, { once: true });
+          try { incoming.currentTime = 0; } catch (e) { go(); }
+          window.setTimeout(go, 400);
+        };
+        if (incoming.readyState >= 1) fromStart();
+        else incoming.addEventListener('loadedmetadata', fromStart, { once: true });
+      };
+      heroVideos.forEach((video, index) => {
+        video.muted = true;
+        video.loop = false;
+        video.playsInline = true;
+        slowHero(video);
+        video.addEventListener('loadedmetadata', () => slowHero(video));
+        video.addEventListener('play', () => {
+          slowHero(video);
+          if (index !== active) video.pause();
+        });
+        video.addEventListener('ended', () => {
+          if (index !== active) return;
+          playHero((index + 1) % heroVideos.length);
+        });
+      });
+      heroVideos.forEach((video, index) => { if (index !== active) video.pause(); });
+      slowHero(heroVideos[0]);
+      heroVideos[0].play().catch(() => {});
+    }
+
+    const nav = document.getElementById('siteNav');
+    const progress = document.getElementById('progress');
+    const menuBtn = document.getElementById('menuBtn');
+    const navLinks = document.getElementById('navLinks');
+    menuBtn.addEventListener('click', () => navLinks.classList.toggle('open'));
+    navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navLinks.classList.remove('open')));
+    window.addEventListener('scroll', () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      progress.style.transform = `scaleX(${max ? window.scrollY / max : 0})`;
+      nav.classList.toggle('scrolled', window.scrollY > 30);
+    }, {passive:true});
+
+    const revealObserver = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); revealObserver.unobserve(entry.target); } }), {threshold:.12});
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+    const barObserver = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) { entry.target.querySelectorAll('.bar-fill').forEach(bar => bar.style.width = bar.dataset.width); barObserver.unobserve(entry.target); } }), {threshold:.3});
+    document.querySelectorAll('.metric-bars').forEach(el => barObserver.observe(el));
+
+    const steps = [
+      ['Read the demonstration','Ground the world state in the observed scene, instruction, and robot trajectory.','Observe'],
+      ['Decompose the scene','Separate static context, support geometry, interactive objects, and robot state.','Structure'],
+      ['Generate editable assets','Invoke specialized image and 3D tools for the components that need to move.','Create'],
+      ['Calibrate the camera','Optimize the camera-pose transform that anchors every entity to the observed frame.','Align'],
+      ['Assemble the world','Write the executable world program: assets, poses, camera, and robot trajectory.','Execute'],
+      ['Probe and validate','Compare render, layout, contacts, and replay; route failures back for targeted refinement.','Verify']
+    ];
+    const detail = document.querySelector('.loop-detail');
+    document.querySelectorAll('.step').forEach(button => button.addEventListener('click', () => {
+      document.querySelectorAll('.step').forEach(b => b.classList.remove('is-active')); button.classList.add('is-active');
+      const i = Number(button.dataset.step), s = steps[i];
+      detail.querySelector('.detail-index').textContent = String(i).padStart(2,'0');
+      detail.querySelector('.detail-copy strong').textContent = s[0];
+      detail.querySelector('.detail-copy span').textContent = s[1];
+      detail.querySelector('.detail-tag').textContent = s[2];
+    }));
+
+    const galleryImage = document.getElementById('galleryImage');
+    document.querySelectorAll('.gallery-tab').forEach(tab => tab.addEventListener('click', () => {
+      document.querySelectorAll('.gallery-tab').forEach(t => t.classList.remove('is-active')); tab.classList.add('is-active');
+      galleryImage.src = tab.dataset.image; galleryImage.alt = tab.dataset.alt; galleryImage.classList.toggle('tall', tab.dataset.tall === 'true');
+    }));
+
+    const copyBib = document.getElementById('copyBib');
+    copyBib.addEventListener('click', async () => { try { await navigator.clipboard.writeText(document.getElementById('bibText').textContent); copyBib.textContent = 'Copied'; copyBib.classList.add('copied'); setTimeout(() => { copyBib.textContent='Copy BibTeX'; copyBib.classList.remove('copied'); }, 1800); } catch(e) { copyBib.textContent='Select text'; } });
+    const lightbox = document.getElementById('lightbox'), lightboxImage = document.getElementById('lightboxImage');
+    document.querySelectorAll('.zoomable').forEach(img => img.addEventListener('click', () => { lightboxImage.src = img.src; lightboxImage.alt = img.alt; lightbox.classList.add('open'); }));
+    document.querySelectorAll('[data-figure-src]').forEach(button => button.addEventListener('click', () => { lightboxImage.src = button.dataset.figureSrc; lightboxImage.alt = button.querySelector('img').alt; lightbox.classList.add('open'); document.getElementById('closeLightbox').focus(); }));
+    document.getElementById('closeLightbox').addEventListener('click', () => lightbox.classList.remove('open'));
+    lightbox.addEventListener('click', e => { if (e.target === lightbox) lightbox.classList.remove('open'); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') lightbox.classList.remove('open'); });
+
+    const demoRoot = 'videos/feishu-blog-demo/Droid demo/';
+    const scenes = [
+      ['Sink', 'Kitchen sink, with a can at the faucet.', 'rpl-164606/original.mp4', 'rpl-164606/original_wrist.mp4', 'rpl-164606/replay_cam_recon.mp4', 'rpl-164606/replay_cam_wrist.mp4'],
+      ['Blocks', 'Colored blocks on a wooden table.', 'rail-152727/original.mp4', 'rail-152727/original_wrist.mp4', 'rail-152727/replay_cam_recon.mp4', 'rail-152727/replay_cam_wrist.mp4'],
+      ['Pot', 'Round table with a lidded pot, towel, and cups.', 'real-112523/20540549.mp4', 'real-112523/11744905.mp4', 'real-112523/replay_cam_recon.mp4', 'real-112523/replay_cam_wrist.mp4'],
+      ['Workbench', 'Workbench with a bowl and an orange cup.', 'autolab-084400/22008760.mp4', 'autolab-084400/18026681.mp4', 'autolab-084400/episode_0000000_cam_recon.mp4', 'autolab-084400/episode_0000000_cam_wrist.mp4'],
+      ['Plate', 'Tabletop with a plate and small objects.', 'rail-105805/original.mp4', 'rail-105805/original_wrist.mp4', 'rail-105805/replay_cam_recon.mp4', 'rail-105805/replay_cam_wrist.mp4'],
+      ['Bottle', 'White table with a bottle, plate, and tray.', 'rad-180233/original.mp4', 'rad-180233/original_wrist.mp4', 'rad-180233/replay_cam_recon.mp4', 'rad-180233/replay_cam_wrist.mp4'],
+      ['Bowl', 'Round table with a bowl and a marker.', 'iris-101439/original.mp4', 'iris-101439/original_wrist.mp4', 'iris-101439/replay_cam_recon.mp4', 'iris-101439/replay_cam_wrist.mp4'],
+      ['Blue cup', 'Round table with a blue cup and a marker.', 'iris-153900/original.mp4', 'iris-153900/original_wrist.mp4', 'iris-153900/replay_cam_recon.mp4', 'iris-153900/replay_cam_wrist.mp4'],
+      ['Cup', 'Wooden table with a black cup and calibration boards.', 'iliad-161943/original.mp4', 'iliad-161943/original_wrist.mp4', 'iliad-161943/replay_cam_recon.mp4', 'iliad-161943/replay_cam_wrist.mp4'],
+      ['Cabinet', 'Cabinet and sink workspace.', 'guptalab-153414/original.mp4', 'guptalab-153414/original_wrist.mp4', 'guptalab-153414/replay_cam_recon.mp4', 'guptalab-153414/replay_cam_wrist.mp4']
+    ];
+    const sceneSwitch = document.getElementById('sceneSwitch');
+    const sceneCaption = document.getElementById('sceneCaption');
+    const demoVideos = {
+      realExt: document.getElementById('realExt'),
+      realWrist: document.getElementById('realWrist'),
+      simExt: document.getElementById('simExt'),
+      simWrist: document.getElementById('simWrist')
+    };
+    const syncToken = { replay: 0, base: 0 };
+    const syncAbort = new WeakMap();
+    function bindUserPause(video) {
+      if (!video || video.dataset.userPauseBound) return;
+      video.dataset.userPauseBound = '1';
+      video.addEventListener('pause', () => {
+        if (video.dataset.syncLive !== '1' || !video.paused) return;
+        video.dataset.userPaused = '1';
+      });
+      video.addEventListener('play', () => {
+        delete video.dataset.userPaused;
+      });
+    }
+    function playSynced(group, clips) {
+      const generation = ++syncToken[group];
+      const list = clips.filter(clip => clip.video && clip.src && !clip.video.hidden);
+      if (!list.length) return;
+      let pending = list.length;
+      const canPlay = clip => clip.video && !clip.video.error && !clip.video.hidden && clip.video.getAttribute('src');
+      const startAll = () => {
+        if (generation !== syncToken[group] || pending !== 0) return;
+        const playable = list.filter(canPlay);
+        playable.forEach(clip => {
+          const video = clip.video;
+          if (video.dataset.userPaused === '1') {
+            video.dataset.syncLive = '1';
+            return;
+          }
+          try { video.currentTime = 0; } catch (e) {}
+          video.dataset.syncLive = '1';
+          video.play().catch(() => {});
+        });
+      };
+      list.forEach(clip => {
+        const video = clip.video;
+        bindUserPause(video);
+        delete video.dataset.userPaused;
+        delete video.dataset.syncLive;
+        video.muted = true;
+        video.loop = true;
+        video.playsInline = true;
+        video.autoplay = true;
+        let settled = false;
+        const done = failed => {
+          if (settled || generation !== syncToken[group]) return;
+          settled = true;
+          if (!failed) video.pause();
+          pending -= 1;
+          if (pending === 0) startAll();
+        };
+        const previous = syncAbort.get(video);
+        if (previous) previous.abort();
+        if (video.getAttribute('src') === clip.src && video.readyState >= 1 && !video.error) {
+          syncAbort.delete(video);
+          done(false);
+          return;
+        }
+        const abort = new AbortController();
+        syncAbort.set(video, abort);
+        video.addEventListener('loadedmetadata', () => done(false), { signal: abort.signal });
+        video.addEventListener('error', () => done(true), { signal: abort.signal });
+        video.pause();
+        if (video.getAttribute('src') !== clip.src) video.src = clip.src;
+        else video.load();
+      });
+    }
+    function selectScene(index) {
+      const scene = scenes[index];
+      sceneSwitch.querySelectorAll('.scene-tab').forEach((tab, i) => {
+        const on = i === index;
+        tab.classList.toggle('is-active', on);
+        tab.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      sceneCaption.textContent = scene[1];
+      playSynced('replay', ['realExt', 'realWrist', 'simExt', 'simWrist'].map((key, i) => ({
+        video: demoVideos[key],
+        src: demoRoot + scene[i + 2]
+      })));
+    }
+    scenes.forEach((scene, index) => {
+      const tab = document.createElement('button');
+      tab.type = 'button';
+      tab.className = 'scene-tab';
+      tab.setAttribute('role', 'tab');
+      tab.textContent = scene[0];
+      tab.addEventListener('click', () => selectScene(index));
+      sceneSwitch.appendChild(tab);
+    });
+    selectScene(0);
+
+    const baseRoot = 'baseline_source_stills/';
+    const baselineScenes = [
+      ['rpl-164606', 'Sink', 'Kitchen sink, with a can on the counter.', true],
+      ['rail-152727', 'Blocks', 'Colored blocks on a wooden table.', true],
+      ['real-112523', 'Pot', 'Round table with a lidded pot, towel, and cups.', true],
+      ['rail-105805', 'Plate', 'Tabletop with a plate and small objects.', false],
+      ['rad-180233', 'Bottle', 'White table with a bottle, plate, and tray.', true],
+      ['iris-101439', 'Bowl', 'Round table with a bowl and a marker.', true],
+      ['iris-153900', 'Blue cup', 'Round table with a blue cup and a marker.', true],
+      ['iliad-161943', 'Cup', 'Wooden table with a black cup and calibration boards.', true],
+      ['guptalab-153414', 'Cabinet', 'Cabinet and sink workspace.', true],
+      ['rad-155000', 'Tray', 'Cutlery tray on a white table.', false]
+    ];
+    const baseMethods = {
+      gt: 'videos/gt.mp4',
+      robosnap: null,
+      rola: 'videos/rola.mp4',
+      gpt6: 'videos/gpt6.mp4',
+      ours: 'videos/ours_isaac_invert.mp4'
+    };
+    const baseSwitch = document.getElementById('baseSwitch');
+    const baseCaption = document.getElementById('baseCaption');
+    const baseStills = {};
+    const baseVideos = {};
+    const baseEmpty = {};
+    Object.keys(baseMethods).forEach(key => {
+      baseStills[key] = document.querySelector(`[data-still="${key}"]`);
+      baseVideos[key] = document.querySelector(`[data-video="${key}"]`);
+      baseEmpty[key] = document.querySelector(`[data-empty="${key}"]`);
+      bindUserPause(baseVideos[key]);
+    });
+    function selectBaseline(index) {
+      syncToken.base += 1;
+      const scene = baselineScenes[index];
+      baseSwitch.querySelectorAll('.scene-tab').forEach((tab, i) => {
+        const on = i === index;
+        tab.classList.toggle('is-active', on);
+        tab.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      const clips = [];
+      Object.entries(baseMethods).forEach(([key, file]) => {
+        const stillSrc = `${baseRoot}${scene[0]}/${key}.png`;
+        baseStills[key].src = stillSrc;
+        baseStills[key].alt = `${scene[1]}, ${key === 'gt' ? 'recorded frame' : 'reconstructed frame'}`;
+        const video = baseVideos[key];
+        const hasVideo = Boolean(file) && (key !== 'ours' || scene[3]);
+        const previous = syncAbort.get(video);
+        if (previous) {
+          previous.abort();
+          syncAbort.delete(video);
+        }
+        delete video.dataset.syncLive;
+        video.pause();
+        if (!hasVideo) {
+          video.hidden = true;
+          video.removeAttribute('src');
+          video.load();
+          baseEmpty[key].hidden = false;
+          return;
+        }
+        baseEmpty[key].hidden = true;
+        video.hidden = false;
+        if (key === 'ours') video.removeAttribute('poster');
+        else video.poster = stillSrc;
+        clips.push({ video, src: `${baseRoot}${scene[0]}/${file}` });
+      });
+      baseCaption.textContent = scene[2];
+      playSynced('base', clips);
+    }
+    baselineScenes.forEach((scene, index) => {
+      const tab = document.createElement('button');
+      tab.type = 'button';
+      tab.className = 'scene-tab';
+      tab.setAttribute('role', 'tab');
+      tab.textContent = scene[1];
+      tab.addEventListener('click', () => selectBaseline(index));
+      baseSwitch.appendChild(tab);
+    });
+    selectBaseline(0);
+
+    const sections = [...document.querySelectorAll('main section[id]')];
+    const linkMap = new Map([...document.querySelectorAll('.nav-links a[href^="#"]')].map(a => [a.getAttribute('href').slice(1), a]));
+    const activeObserver = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) { linkMap.forEach(a => a.classList.remove('active')); linkMap.get(entry.target.id)?.classList.add('active'); } }), {rootMargin:'-40% 0px -50%'});
+    sections.forEach(s => activeObserver.observe(s));
+  </script>
+</body>
+</html>
