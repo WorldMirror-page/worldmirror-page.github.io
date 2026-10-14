@@ -88,6 +88,7 @@
     .why-card p { margin:0; color:#67748a; font-size:14px; }
     .overview-head { max-width: 720px; margin-inline: auto; text-align: center; }
     .overview-head .section-kicker { justify-content: center; }
+    .overview-head h2.section-kicker { margin: 0; }
     .overview-head .section-title { margin-inline: auto; text-wrap: balance; }
     .story-abstract { margin: 32px auto 0; max-width: 38rem; text-align: center; }
     .story-abstract p { margin: 0; color: #506079; font-size: 17px; line-height: 1.62; }
@@ -102,6 +103,9 @@
     .abstract-body p { margin: 0; color: #506079; font-size: 17px; line-height: 1.7; }
     .abstract-body strong { color: #17345a; font-weight: 750; }
     .abstract-body p + p { margin-top: 16px; }
+    .subsection-head { margin-top: 22px; }
+    .qual-figures { margin-top: 76px; }
+    .qual-figures .gallery-layout { margin-top: 28px; }
     .dark-section { background: var(--ink); color: var(--white); }
     .dark-section .section-kicker { color: var(--cyan); }
     .dark-section .section-title em { color: var(--cyan); }
@@ -335,7 +339,7 @@
       <a class="brand" href="#top" aria-label="WorldMirror home"><span class="brand-mark"><img src="logo.png" alt="" width="34" height="34"></span><span>WorldMirror<small>Real-to-Sim research</small></span></a>
       <button class="menu-btn" id="menuBtn" aria-label="Open navigation">☰</button>
       <nav class="nav-links" id="navLinks" aria-label="Primary navigation">
-        <a href="#story">Overview</a><a href="#abstract">Abstract</a><a href="#method">Method</a><a href="#replay">Replay</a><a href="#scene3d">Scene</a><a href="#baselines">Compare</a><a href="#evidence">Evidence</a><a href="#gallery">Qualitative</a><a class="nav-action" href="#citation">Cite this work</a>
+        <a href="#story">Overview</a><a href="#method">Method</a><a href="#replay">Demos</a><a href="#qualitative">Qualitative</a><a class="nav-action" href="#citation">Cite</a>
       </nav>
     </div>
   </header>
@@ -369,7 +373,7 @@
 
     <section class="section abstract-section" id="abstract" aria-labelledby="abstract-title">
       <div class="section-inner">
-        <div class="overview-head reveal"><h2 class="section-title" id="abstract-title">Abstract</h2></div>
+        <div class="overview-head reveal"><h2 class="section-kicker" id="abstract-title">01 · Abstract</h2></div>
         <div class="abstract-body reveal">
           <p>Existing approaches for robot learning in simulation often require substantial manual effort to construct scenes and specify tasks, limiting training scalability and data diversity. Meanwhile, in-the-wild robot demonstrations naturally provide diverse and realistic observations of real-world interactions. Leveraging these demonstrations for simulation requires both high-fidelity visual reconstruction and physically consistent interactions. General-purpose agents offer flexible adaptation to diverse scenarios and strong reasoning about 3D spatial relationships, while specialized generative models provide high-fidelity reconstruction of scene appearance and geometry.</p>
           <p>We introduce <strong>WorldMirror</strong>, an agentic real-to-sim framework that constructs interactive digital twins from in-the-wild robot demonstrations. Our central idea is to formulate real-to-sim construction as the iterative refinement of an executable world program. A coding agent decomposes the observed scene, plans reconstruction steps, and orchestrates specialized image and 3D generation tools, refining the program through verification feedback.</p>
@@ -380,7 +384,7 @@
 
     <section class="section dark-section" id="method">
       <div class="section-inner">
-        <div class="method-intro reveal"><div><div class="section-kicker">01 · Method</div><h2 class="section-title">An agent that <em>builds, checks,</em> and builds again.</h2></div><p class="method-copy">Instead of a fixed pipeline, a router agent maintains a structured world state, delegates to specialized tools, and uses verification feedback to decide what to revisit next.</p></div>
+        <div class="method-intro reveal"><div><div class="section-kicker">02 · Method</div><h2 class="section-title">An agent that <em>builds, checks,</em> and builds again.</h2></div><p class="method-copy">Instead of a fixed pipeline, a router agent maintains a structured world state, delegates to specialized tools, and uses verification feedback to decide what to revisit next.</p></div>
         <div class="method-art reveal"><div class="art-frame"><img src="framework-v5.png" width="4800" height="2700" alt="WorldMirror framework diagram showing the agentic real-to-sim reconstruction loop" loading="lazy" decoding="async" /></div></div>
         <div class="step-row reveal" role="tablist" aria-label="WorldMirror construction steps"><button class="step is-active" data-step="0"><strong>00</strong><b>Read demonstration</b></button><button class="step" data-step="1"><strong>01</strong><b>Decompose scene</b></button><button class="step" data-step="2"><strong>02</strong><b>Generate assets</b></button><button class="step" data-step="3"><strong>03</strong><b>Calibrate camera</b></button><button class="step" data-step="4"><strong>04</strong><b>Assemble world</b></button><button class="step" data-step="5"><strong>05</strong><b>Probe &amp; validate</b></button></div>
         <div class="loop-detail reveal" aria-live="polite"><div class="detail-index">00</div><div class="detail-copy"><strong>Read the demonstration</strong><span>Ground the world state in the observed scene, instruction, and robot trajectory.</span></div><div class="detail-tag">Observe</div></div>
@@ -493,7 +497,7 @@
 
     <section class="section demos" id="replay">
       <div class="section-inner">
-        <div class="reveal"><div class="section-kicker">Replay</div><h2 class="section-title">The same trajectory, <em>in the mirror.</em></h2><p class="demo-lead">Ten DROID demonstrations. Each one pairs the real exterior and wrist views with the WorldMirror replay of that trajectory.</p></div>
+        <div class="reveal"><div class="section-kicker">03 · Demos</div><h2 class="section-title">The same trajectory, <em>in the mirror.</em></h2><p class="demo-lead">Ten DROID demonstrations. Each one pairs the real exterior and wrist views with the WorldMirror replay of that trajectory.</p></div>
         <div class="scene-switch" id="sceneSwitch" role="tablist" aria-label="Replay scenes"></div>
         <div class="compare">
           <div class="compare-col">
@@ -533,9 +537,10 @@
       </div>
     </section>
 
-    <section class="section fidelity" id="evidence">
+    <section class="section gallery" id="qualitative">
       <div class="section-inner">
-        <div class="reveal"><div class="section-kicker">02 · Evidence</div><h2 class="section-title">Fidelity is a <em>three-part contract.</em></h2></div>
+        <div class="reveal"><div class="section-kicker">04 · Qualitative</div></div>
+        <div class="reveal subsection-head" id="evidence"><div class="section-kicker">Evidence</div><h2 class="section-title">Fidelity is a <em>three-part contract.</em></h2></div>
         <div class="metric-strip"><article class="metric-card cyan reveal"><span>Motion replay</span><strong>1.79 cm</strong><p>Displacement error when the recorded trajectory is replayed in Isaac Sim.</p></article><article class="metric-card orange reveal"><span>Physical interaction</span><strong>0.873</strong><p>Contact F1 during that same replay.</p></article><article class="metric-card lime reveal"><span>Replay success</span><strong>100%</strong><p>Recorded trajectories that complete in simulation, without retargeting.</p></article></div>
         <div class="evidence-grid"><div class="evidence-copy reveal"><h3>The recorded motion still fits the reconstructed world.</h3><p>The comparison is trajectory replay in Isaac Sim, not a real-robot policy evaluation. Lower displacement error means the replay stays closer to the demonstration.</p></div><div class="chart-card reveal"><div class="metric-bars"><div class="bar-row"><label>WorldMirror</label><div class="bar-track"><div class="bar-fill" data-width="94%"></div></div><small>1.79</small></div><div class="bar-row"><label>GPT-6 Astra</label><div class="bar-track"><div class="bar-fill" data-width="48%"></div></div><small>11.17</small></div><div class="bar-row"><label>RoLA</label><div class="bar-track"><div class="bar-fill" data-width="18%"></div></div><small>24.70</small></div></div><p class="chart-caption">Displacement error in centimeters. Longer bars correspond to lower error.</p></div></div>
         <div class="placed-table reveal" id="motion-replay">
@@ -592,12 +597,6 @@
             </div>
           </figure>
         </div>
-      </div>
-    </section>
-
-    <section class="section gallery" id="gallery">
-      <div class="section-inner">
-        <div class="reveal"><div class="section-kicker">03 · Qualitative results</div><h2 class="section-title">The mirror should hold up <em>frame by frame.</em></h2></div>
         <div class="placed-table reveal" id="appearance">
           <p class="table-lead">Appearance is measured on the same ten exterior views.</p>
           <figure class="paper-table-block">
@@ -716,12 +715,12 @@
             </div>
           </figure>
         </div>
-        <div class="gallery-layout"><div class="gallery-tabs reveal"><button class="gallery-tab is-active" data-image="4scene_methods.png" data-alt="Four scene comparisons across GT, RoboSnap, RoLA, GPT-6 Astra, and WorldMirror" data-tall="false"><strong>Scene fidelity</strong><span>Real appearance, layout, and object placement.</span></button><button class="gallery-tab" data-image="wrist_timeline.png" data-alt="Wrist-view timeline comparison for rigid, separable, and articulated objects" data-tall="true"><strong>Trajectory replay</strong><span>Correspondence over time, from first frame to completion.</span></button></div><div class="gallery-display reveal"><div class="art-frame"><img id="galleryImage" class="zoomable" src="4scene_methods.png" alt="Four scene comparisons across GT, RoboSnap, RoLA, GPT-6 Astra, and WorldMirror" loading="lazy" decoding="async" /></div></div></div>
+        <div class="qual-figures"><div class="reveal"><h2 class="section-title">The mirror should hold up <em>frame by frame.</em></h2></div><div class="gallery-layout"><div class="gallery-tabs reveal"><button class="gallery-tab is-active" data-image="4scene_methods.png" data-alt="Four scene comparisons across GT, RoboSnap, RoLA, GPT-6 Astra, and WorldMirror" data-tall="false"><strong>Scene fidelity</strong><span>Real appearance, layout, and object placement.</span></button><button class="gallery-tab" data-image="wrist_timeline.png" data-alt="Wrist-view timeline comparison for rigid, separable, and articulated objects" data-tall="true"><strong>Trajectory replay</strong><span>Correspondence over time, from first frame to completion.</span></button></div><div class="gallery-display reveal"><div class="art-frame"><img id="galleryImage" class="zoomable" src="4scene_methods.png" alt="Four scene comparisons across GT, RoboSnap, RoLA, GPT-6 Astra, and WorldMirror" loading="lazy" decoding="async" /></div></div></div></div>
       </div>
     </section>
 
     <section class="section citation" id="citation">
-      <div class="section-inner"><div class="section-kicker reveal" style="color:var(--cyan)">05 · Citation</div><div class="citation-grid"><div class="reveal"><h2 class="section-title">Build on the <em>mirror.</em></h2><p class="citation-copy">Use the title and BibTeX below when you want to reference the WorldMirror project. The paper PDF is available for a closer look at the method and experiments.</p><p class="citation-copy"><a href="_ICLR_27_WorldMirror__Refine_ver.pdf" target="_blank" rel="noopener">Download the full paper ↗</a></p></div><div class="bib reveal"><button class="copy" id="copyBib">Copy BibTeX</button><code id="bibText">@article{worldmirror,
+      <div class="section-inner"><div class="section-kicker reveal" style="color:var(--cyan)">Citation</div><div class="citation-grid"><div class="reveal"><h2 class="section-title">Build on the <em>mirror.</em></h2><p class="citation-copy">Use the title and BibTeX below when you want to reference the WorldMirror project. The paper PDF is available for a closer look at the method and experiments.</p><p class="citation-copy"><a href="_ICLR_27_WorldMirror__Refine_ver.pdf" target="_blank" rel="noopener">Download the full paper ↗</a></p></div><div class="bib reveal"><button class="copy" id="copyBib">Copy BibTeX</button><code id="bibText">@article{worldmirror,
   title={WorldMirror: Agentic Real-to-Sim Generation of Interactive Worlds from In-the-Wild Robot Demonstrations},
   author={Anonymous authors}
 }</code></div></div></div>
@@ -1149,9 +1148,10 @@
     });
     window.whenHeroReady(() => selectBaseline(0));
 
+    const navTarget = { story: 'story', abstract: 'story', method: 'method', scope: 'method', replay: 'replay', scene3d: 'replay', baselines: 'replay', qualitative: 'qualitative', citation: 'citation' };
     const sections = [...document.querySelectorAll('main section[id]')];
     const linkMap = new Map([...document.querySelectorAll('.nav-links a[href^="#"]')].map(a => [a.getAttribute('href').slice(1), a]));
-    const activeObserver = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) { linkMap.forEach(a => a.classList.remove('active')); linkMap.get(entry.target.id)?.classList.add('active'); } }), {rootMargin:'-40% 0px -50%'});
+    const activeObserver = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) { const key = navTarget[entry.target.id]; linkMap.forEach(a => a.classList.remove('active')); if (key) linkMap.get(key)?.classList.add('active'); } }), {rootMargin:'-40% 0px -50%'});
     sections.forEach(s => activeObserver.observe(s));
   </script>
 </body>
