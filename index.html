@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#fbfaf6" />
   <meta name="description" content="WorldMirror — Agentic real-to-sim generation of interactive worlds from in-the-wild robot demonstrations." />
   <title>WorldMirror · Agentic Real-to-Sim</title>
+  <link rel="preload" as="video" href="%E9%A3%9E%E4%B9%A620261012-120412.mp4" fetchpriority="high">
   <style>
     :root {
       --ink: #0a1021;
@@ -337,8 +338,8 @@
   <main id="top">
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero-bg" aria-hidden="true">
-        <video class="is-active is-front" src="%E9%A3%9E%E4%B9%A620261012-120412-720p.mp4" autoplay muted playsinline preload="auto"></video>
-        <video src="%E9%A3%9E%E4%B9%A620261012-173756-720p.mp4" autoplay muted playsinline preload="auto"></video>
+        <video class="is-active is-front" src="%E9%A3%9E%E4%B9%A620261012-120412.mp4" autoplay muted playsinline preload="auto" fetchpriority="high"></video>
+        <video data-src="%E9%A3%9E%E4%B9%A620261012-173756.mp4" muted playsinline preload="none"></video>
       </div>
       <div class="hero-inner">
         <h1 id="hero-title"><span class="project-name">World<em>Mirror</em></span><span class="paper-title">Agentic Real-to-Sim Generation of Interactive Worlds from In-the-Wild Robot Demonstrations</span></h1>
@@ -352,7 +353,7 @@
       <div class="section-inner">
         <div class="overview-head reveal"><div class="section-kicker">Overview</div><h2 class="section-title">Interactive worlds from in-the-wild demonstrations.</h2></div>
         <figure class="story-teaser reveal">
-          <div class="art-frame"><img class="zoomable" src="teaser-v3.png" width="4800" height="2879" alt="GPT-6 Astra and WorldMirror on spatial structure, visual fidelity, and physical consistency. Astra keeps the layout and fails appearance and contact. WorldMirror holds all three." /></div>
+          <div class="art-frame"><img class="zoomable" src="teaser-v3.png" width="4800" height="2879" alt="GPT-6 Astra and WorldMirror on spatial structure, visual fidelity, and physical consistency. Astra keeps the layout and fails appearance and contact. WorldMirror holds all three." loading="lazy" decoding="async" /></div>
         </figure>
         <div class="story-abstract reveal">
           <p>WorldMirror turns in-the-wild demonstrations into interactive twins by iteratively refining an executable world program. A camera-pose-anchored scene lets the recorded trajectory replay unchanged.</p>
@@ -364,7 +365,7 @@
     <section class="section dark-section" id="method">
       <div class="section-inner">
         <div class="method-intro reveal"><div><div class="section-kicker">01 · Method</div><h2 class="section-title">An agent that <em>builds, checks,</em> and builds again.</h2></div><p class="method-copy">Instead of a fixed pipeline, a router agent maintains a structured world state, delegates to specialized tools, and uses verification feedback to decide what to revisit next.</p></div>
-        <div class="method-art reveal"><div class="art-frame"><img src="framework-v5.png" width="4800" height="2700" alt="WorldMirror framework diagram showing the agentic real-to-sim reconstruction loop" /></div></div>
+        <div class="method-art reveal"><div class="art-frame"><img src="framework-v5.png" width="4800" height="2700" alt="WorldMirror framework diagram showing the agentic real-to-sim reconstruction loop" loading="lazy" decoding="async" /></div></div>
         <div class="step-row reveal" role="tablist" aria-label="WorldMirror construction steps"><button class="step is-active" data-step="0"><strong>00</strong><b>Read demonstration</b></button><button class="step" data-step="1"><strong>01</strong><b>Decompose scene</b></button><button class="step" data-step="2"><strong>02</strong><b>Generate assets</b></button><button class="step" data-step="3"><strong>03</strong><b>Calibrate camera</b></button><button class="step" data-step="4"><strong>04</strong><b>Assemble world</b></button><button class="step" data-step="5"><strong>05</strong><b>Probe &amp; validate</b></button></div>
         <div class="loop-detail reveal" aria-live="polite"><div class="detail-index">00</div><div class="detail-copy"><strong>Read the demonstration</strong><span>Ground the world state in the observed scene, instruction, and robot trajectory.</span></div><div class="detail-tag">Observe</div></div>
       </div>
@@ -699,7 +700,7 @@
             </div>
           </figure>
         </div>
-        <div class="gallery-layout"><div class="gallery-tabs reveal"><button class="gallery-tab is-active" data-image="4scene_methods.png" data-alt="Four scene comparisons across GT, RoboSnap, RoLA, GPT-6 Astra, and WorldMirror" data-tall="false"><strong>Scene fidelity</strong><span>Real appearance, layout, and object placement.</span></button><button class="gallery-tab" data-image="wrist_timeline.png" data-alt="Wrist-view timeline comparison for rigid, separable, and articulated objects" data-tall="true"><strong>Trajectory replay</strong><span>Correspondence over time, from first frame to completion.</span></button></div><div class="gallery-display reveal"><div class="art-frame"><img id="galleryImage" class="zoomable" src="4scene_methods.png" alt="Four scene comparisons across GT, RoboSnap, RoLA, GPT-6 Astra, and WorldMirror" /></div></div></div>
+        <div class="gallery-layout"><div class="gallery-tabs reveal"><button class="gallery-tab is-active" data-image="4scene_methods.png" data-alt="Four scene comparisons across GT, RoboSnap, RoLA, GPT-6 Astra, and WorldMirror" data-tall="false"><strong>Scene fidelity</strong><span>Real appearance, layout, and object placement.</span></button><button class="gallery-tab" data-image="wrist_timeline.png" data-alt="Wrist-view timeline comparison for rigid, separable, and articulated objects" data-tall="true"><strong>Trajectory replay</strong><span>Correspondence over time, from first frame to completion.</span></button></div><div class="gallery-display reveal"><div class="art-frame"><img id="galleryImage" class="zoomable" src="4scene_methods.png" alt="Four scene comparisons across GT, RoboSnap, RoLA, GPT-6 Astra, and WorldMirror" loading="lazy" decoding="async" /></div></div></div>
       </div>
     </section>
 
@@ -721,6 +722,16 @@
       const status = document.getElementById("splatStatus");
       if (status) status.textContent = "Open this page through a local server. A file:// address cannot load the 3D scene.";
     }
+    window.whenHeroReady = function (start) {
+      const first = document.querySelector(".hero-bg video.is-front");
+      let started = false;
+      const go = () => { if (started) return; started = true; start(); };
+      if (!first) { go(); return; }
+      if (first.readyState >= 3) { go(); return; }
+      first.addEventListener("canplay", go, { once: true });
+      first.addEventListener("error", go, { once: true });
+      window.setTimeout(go, 8000);
+    };
   </script>
   <script type="module">
     import * as THREE from "three";
@@ -792,6 +803,7 @@
     const fill = new THREE.DirectionalLight(0xdfe7ff, 0.55);
     fill.position.set(-2.2, 2.4, -1.6);
     viewer.threeScene.add(hemi, sun, fill);
+    window.whenHeroReady(() => {
     const props = new GLTFLoader().loadAsync("scene/props-pbr.glb").then((gltf) => {
       gltf.scene.traverse((obj) => {
         if (!obj.isMesh) return;
@@ -813,6 +825,7 @@
     }).catch((error) => {
       status.textContent = "The scene could not be loaded. " + (error && error.message ? error.message : "");
       console.error(error);
+    });
     });
     }
   </script>
@@ -868,6 +881,13 @@
         });
       });
       heroVideos.forEach((video, index) => { if (index !== active) video.pause(); });
+      const queueNextHero = () => {
+        const next = heroVideos[1];
+        if (!next || next.getAttribute("src") || !next.dataset.src) return;
+        next.preload = "auto";
+        next.src = next.dataset.src;
+      };
+      heroVideos[0].addEventListener("canplay", queueNextHero, { once: true });
       slowHero(heroVideos[0]);
       heroVideos[0].play().catch(() => {});
     }
@@ -1031,7 +1051,7 @@
       tab.addEventListener('click', () => selectScene(index));
       sceneSwitch.appendChild(tab);
     });
-    selectScene(0);
+    window.whenHeroReady(() => selectScene(0));
 
     const baseRoot = 'baseline_source_stills/';
     const baselineScenes = [
@@ -1111,7 +1131,7 @@
       tab.addEventListener('click', () => selectBaseline(index));
       baseSwitch.appendChild(tab);
     });
-    selectBaseline(0);
+    window.whenHeroReady(() => selectBaseline(0));
 
     const sections = [...document.querySelectorAll('main section[id]')];
     const linkMap = new Map([...document.querySelectorAll('.nav-links a[href^="#"]')].map(a => [a.getAttribute('href').slice(1), a]));
