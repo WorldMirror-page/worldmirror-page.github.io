@@ -339,7 +339,7 @@
       <a class="brand" href="#top" aria-label="WorldMirror home"><span class="brand-mark"><img src="logo.png" alt="" width="34" height="34"></span><span>WorldMirror<small>Real-to-Sim research</small></span></a>
       <button class="menu-btn" id="menuBtn" aria-label="Open navigation">☰</button>
       <nav class="nav-links" id="navLinks" aria-label="Primary navigation">
-        <a href="#story">Overview</a><a href="#method">Method</a><a href="#replay">Demos</a><a href="#qualitative">Qualitative</a><a class="nav-action" href="#citation">Cite</a>
+        <a href="#story">Overview</a><a href="#abstract">Abstract</a><a href="#method">Method</a><a href="#replay">Demos</a><a href="#qualitative">Qualitative</a><a class="nav-action" href="#citation">Cite</a>
       </nav>
     </div>
   </header>
@@ -1148,7 +1148,7 @@
     });
     window.whenHeroReady(() => selectBaseline(0));
 
-    const navTarget = { story: 'story', abstract: 'story', method: 'method', scope: 'method', replay: 'replay', scene3d: 'replay', baselines: 'replay', qualitative: 'qualitative', citation: 'citation' };
+    const navTarget = { story: 'story', abstract: 'abstract', method: 'method', scope: 'method', replay: 'replay', scene3d: 'replay', baselines: 'replay', qualitative: 'qualitative', citation: 'citation' };
     const sections = [...document.querySelectorAll('main section[id]')];
     const linkMap = new Map([...document.querySelectorAll('.nav-links a[href^="#"]')].map(a => [a.getAttribute('href').slice(1), a]));
     const activeObserver = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) { const key = navTarget[entry.target.id]; linkMap.forEach(a => a.classList.remove('active')); if (key) linkMap.get(key)?.classList.add('active'); } }), {rootMargin:'-40% 0px -50%'});
