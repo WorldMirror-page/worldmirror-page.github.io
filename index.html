@@ -97,6 +97,11 @@
     .story-teaser .art-caption { flex-wrap: wrap; align-items: baseline; }
     .story-teaser .art-caption span:first-child { flex: 1 1 18rem; }
     .story-abstract + .why-grid { margin-top: 88px; }
+    .abstract-section { background: #fffdf8; border-top: 1px solid rgba(23, 52, 90, .08); border-bottom: 1px solid rgba(23, 52, 90, .08); }
+    .abstract-body { max-width: 46rem; margin: 22px auto 0; text-align: left; }
+    .abstract-body p { margin: 0; color: #506079; font-size: 17px; line-height: 1.7; }
+    .abstract-body strong { color: #17345a; font-weight: 750; }
+    .abstract-body p + p { margin-top: 16px; }
     .dark-section { background: var(--ink); color: var(--white); }
     .dark-section .section-kicker { color: var(--cyan); }
     .dark-section .section-title em { color: var(--cyan); }
@@ -330,7 +335,7 @@
       <a class="brand" href="#top" aria-label="WorldMirror home"><span class="brand-mark"><img src="logo.png" alt="" width="34" height="34"></span><span>WorldMirror<small>Real-to-Sim research</small></span></a>
       <button class="menu-btn" id="menuBtn" aria-label="Open navigation">☰</button>
       <nav class="nav-links" id="navLinks" aria-label="Primary navigation">
-        <a href="#story">Overview</a><a href="#method">Method</a><a href="#replay">Replay</a><a href="#scene3d">Scene</a><a href="#baselines">Compare</a><a href="#evidence">Evidence</a><a href="#gallery">Qualitative</a><a class="nav-action" href="#citation">Cite this work</a>
+        <a href="#story">Overview</a><a href="#abstract">Abstract</a><a href="#method">Method</a><a href="#replay">Replay</a><a href="#scene3d">Scene</a><a href="#baselines">Compare</a><a href="#evidence">Evidence</a><a href="#gallery">Qualitative</a><a class="nav-action" href="#citation">Cite this work</a>
       </nav>
     </div>
   </header>
@@ -359,6 +364,17 @@
           <p>WorldMirror turns in-the-wild demonstrations into interactive twins by iteratively refining an executable world program. A camera-pose-anchored scene lets the recorded trajectory replay unchanged.</p>
         </div>
         <div class="why-grid"><article class="why-card reveal"><span class="why-num">01 / APPEARANCE</span><h3>See the scene.</h3><p>Recover the visual context of the observed environment with a high-fidelity static reconstruction.</p></article><article class="why-card reveal"><span class="why-num">02 / STRUCTURE</span><h3>Place the parts.</h3><p>Represent task-relevant objects as editable assets with poses, geometry, and interaction semantics.</p></article><article class="why-card reveal"><span class="why-num">03 / EXECUTION</span><h3>Replay the motion.</h3><p>Anchor the scene, objects, and robot to one camera-pose frame so the original trajectory can run unchanged.</p></article></div>
+      </div>
+    </section>
+
+    <section class="section abstract-section" id="abstract" aria-labelledby="abstract-title">
+      <div class="section-inner">
+        <div class="overview-head reveal"><h2 class="section-title" id="abstract-title">Abstract</h2></div>
+        <div class="abstract-body reveal">
+          <p>Existing approaches for robot learning in simulation often require substantial manual effort to construct scenes and specify tasks, limiting training scalability and data diversity. Meanwhile, in-the-wild robot demonstrations naturally provide diverse and realistic observations of real-world interactions. Leveraging these demonstrations for simulation requires both high-fidelity visual reconstruction and physically consistent interactions. General-purpose agents offer flexible adaptation to diverse scenarios and strong reasoning about 3D spatial relationships, while specialized generative models provide high-fidelity reconstruction of scene appearance and geometry.</p>
+          <p>We introduce <strong>WorldMirror</strong>, an agentic real-to-sim framework that constructs interactive digital twins from in-the-wild robot demonstrations. Our central idea is to formulate real-to-sim construction as the iterative refinement of an executable world program. A coding agent decomposes the observed scene, plans reconstruction steps, and orchestrates specialized image and 3D generation tools, refining the program through verification feedback.</p>
+          <p>A camera-pose-anchored scene representation organizes the world into static visual context, support geometry, and editable interactive assets while preserving spatial relationships among the scene, objects, and robot. The agent uses this representation to diagnose and correct reconstruction errors, enabling physically consistent interaction and trajectory replay. Experiments on DROID demonstrate that WorldMirror can reconstruct visually faithful and geometrically consistent interactive worlds while preserving the physical validity of recorded robot trajectories.</p>
+        </div>
       </div>
     </section>
 
