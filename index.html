@@ -38,7 +38,6 @@
     .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--white); font-weight: 800; letter-spacing: -.04em; }
     .brand-mark { display: block; width: 34px; height: 34px; flex: none; border-radius: 50%; overflow: hidden; border: 1px solid rgba(23,52,90,.35); box-shadow: 0 0 0 3px rgba(84,203,187,.16); }
     .brand-mark img { width: 100%; height: 100%; max-width: none; object-fit: cover; transform: scale(1.16); transform-origin: center; }
-    .brand small { display:block; color: #a7b0c5; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; font-size: 9px; line-height: 1.1; }
     .nav-links { display:flex; gap: 24px; align-items:center; color: #c3cadd; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
     .nav-links a { opacity: .75; transition: color .2s, opacity .2s; }
     .nav-links a:hover, .nav-links a.active { color: var(--cyan-2); opacity: 1; }
@@ -80,12 +79,6 @@
     .intro-grid { display:grid; grid-template-columns: 1.04fr .96fr; gap: 78px; align-items:end; }
     .intro-copy { max-width: 560px; font-size:18px; color:#506079; }
     .intro-copy strong { color: var(--ink); }
-    .why-grid { margin-top: 65px; display:grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
-    .why-card { padding: 27px; border-top: 2px solid var(--ink); background: rgba(255,255,255,.38); min-height: 210px; transition: transform .25s, background .25s; }
-    .why-card:hover { transform: translateY(-6px); background:#fffdf8; }
-    .why-num { color:#7e8ca7; font: 700 12px ui-monospace, monospace; }
-    .why-card h3 { margin: 36px 0 9px; font-size:22px; letter-spacing:-.04em; }
-    .why-card p { margin:0; color:#67748a; font-size:14px; }
     .overview-head { max-width: 720px; margin-inline: auto; text-align: center; }
     .overview-head .section-kicker { justify-content: center; }
     .overview-head h2.section-kicker { margin: 0; }
@@ -97,8 +90,7 @@
     .story-teaser .art-frame img { width: 100%; height: auto; cursor: zoom-in; }
     .story-teaser .art-caption { flex-wrap: wrap; align-items: baseline; }
     .story-teaser .art-caption span:first-child { flex: 1 1 18rem; }
-    .story-abstract + .why-grid { margin-top: 88px; }
-    .abstract-section { background: #fffdf8; border-top: 1px solid rgba(23, 52, 90, .08); border-bottom: 1px solid rgba(23, 52, 90, .08); }
+    .abstract-section { background: #f3efe6; }
     .abstract-body { max-width: 46rem; margin: 22px auto 0; text-align: left; }
     .abstract-body p { margin: 0; color: #506079; font-size: 17px; line-height: 1.7; }
     .abstract-body strong { color: #17345a; font-weight: 750; }
@@ -148,6 +140,7 @@
     .chart-caption { margin: 11px 2px 0; color:#748098; font-size:11px; line-height:1.4; }
     .chart-card .metric-bars { padding: 16px 10px 4px; }
     .scope { background: #f0eee5; }
+    .scene-band { background: #e7f2ed; }
     .placed-table { margin-top: 40px; }
     .placed-table + .placed-table { margin-top: 48px; }
     .table-lead { margin: 0; max-width: 680px; color: #5e7189; font-size: 17px; line-height: 1.55; }
@@ -220,7 +213,7 @@
       .section { padding-top: 54px; padding-bottom: 54px; }
       .signal-inner { display:block; }
       .signal-inner > span { display:block; margin-top:6px; }
-      .why-grid, .metric-strip { grid-template-columns:1fr; }
+      .metric-strip { grid-template-columns:1fr; }
       .step-row { grid-template-columns:repeat(2,1fr); }
       .loop-detail { grid-template-columns: 55px 1fr; }
       .detail-tag { grid-column:2; justify-self:start; }
@@ -251,7 +244,6 @@
     .site-nav { color: var(--ink); background: transparent; border-bottom-color: transparent; }
     .site-nav.scrolled { background: rgba(251,250,246,.9); box-shadow: 0 8px 28px rgba(23,52,90,.1); }
     .brand { color: var(--ink); }
-    .brand small { color: #71859c; }
     .nav-links { color: #5d7390; }
     .nav-links a:hover, .nav-links a.active { color: var(--cyan-2); }
     .nav-action { color: var(--cyan-2); border-color: rgba(23,127,131,.35); background: rgba(84,203,187,.12); }
@@ -263,8 +255,6 @@
     .btn-secondary:hover { background: #fff; }
     .signal { background: #dff3eb; color: var(--ink); }
     .signal-flow i { background: var(--cyan-2); }
-    .why-card { background: rgba(255,255,255,.68); border-top-color: var(--ink); }
-    .why-card:hover { background: #fff; }
     .dark-section { background: #e7f2ed; color: var(--ink); }
     .dark-section .section-kicker { color: #238b81; }
     .dark-section .section-title em { color: #238b81; }
@@ -340,7 +330,7 @@
   <div class="progress" id="progress"></div>
   <header class="site-nav" id="siteNav">
     <div class="nav-inner">
-      <a class="brand" href="#top" aria-label="WorldMirror home"><span class="brand-mark"><img src="logo.png" alt="" width="34" height="34"></span><span>WorldMirror<small>Real-to-Sim research</small></span></a>
+      <a class="brand" href="#top" aria-label="WorldMirror home"><span class="brand-mark"><img src="logo.png" alt="" width="34" height="34"></span><span>WorldMirror</span></a>
       <button class="menu-btn" id="menuBtn" aria-label="Open navigation">☰</button>
       <nav class="nav-links" id="navLinks" aria-label="Primary navigation">
         <a href="#story">Overview</a><a href="#abstract">Abstract</a><a href="#method">Method</a><a href="#replay">Demos</a><a href="#qualitative">Qualitative</a><a class="nav-action" href="#citation">Cite</a>
@@ -360,7 +350,7 @@
         <div class="hero-cta"><a class="btn btn-primary" href="_ICLR_27_WorldMirror__Refine_ver.pdf" target="_blank" rel="noopener">Paper</a><a class="btn btn-secondary" href="#replay">Replay</a></div>
       </div>
     </section>
-    <div class="signal"><div class="signal-inner"><div class="signal-flow"><span>RGB video</span><i></i><span>World program</span><i></i><span>Interactive twin</span><i></i><span>Trajectory replay</span></div><span>One shared camera-anchored frame</span></div></div>
+    <div class="signal"><div class="signal-inner"><div class="signal-flow"><span>RGB video</span><i></i><span>World program</span><i></i><span>Interactive twin</span><i></i><span>Trajectory replay</span></div><span>One shared camera-anchored coordinate system</span></div></div>
 
     <section class="section" id="story">
       <div class="section-inner">
@@ -371,7 +361,6 @@
         <div class="story-abstract reveal">
           <p>WorldMirror turns in-the-wild demonstrations into interactive twins by iteratively refining an executable world program. A camera-pose-anchored scene lets the recorded trajectory replay unchanged.</p>
         </div>
-        <div class="why-grid"><article class="why-card reveal"><span class="why-num">01 / APPEARANCE</span><h3>See the scene.</h3><p>Recover the visual context of the observed environment with a high-fidelity static reconstruction.</p></article><article class="why-card reveal"><span class="why-num">02 / STRUCTURE</span><h3>Place the parts.</h3><p>Represent task-relevant objects as editable assets with poses, geometry, and interaction semantics.</p></article><article class="why-card reveal"><span class="why-num">03 / EXECUTION</span><h3>Replay the motion.</h3><p>Anchor the scene, objects, and robot to one camera-pose frame so the original trajectory can run unchanged.</p></article></div>
       </div>
     </section>
 
@@ -519,7 +508,7 @@
       </div>
     </section>
 
-    <section class="section" id="scene3d">
+    <section class="section scene-band" id="scene3d">
       <div class="section-inner">
         <div class="reveal"><div class="section-kicker">Scene</div><h2 class="section-title">Turn the reconstructed <em>world.</em></h2><p class="demo-lead">Seven DROID scenes, reconstructed the same way. The photo stays in the corner so the real first frame can be compared with the orbit. Drag to turn the full circle, and scroll to move closer.</p></div>
         <div class="scene-switch" id="splatSwitch" role="tablist" aria-label="Reconstructed scenes"></div>
