@@ -90,12 +90,15 @@
     .story-teaser .art-frame img { width: 100%; height: auto; cursor: zoom-in; }
     .story-teaser .art-caption { flex-wrap: wrap; align-items: baseline; }
     .story-teaser .art-caption span:first-child { flex: 1 1 18rem; }
-    .abstract-section { background: #f3efe6; }
+    .abstract-section { background: #e7f2ed; }
     .abstract-body { max-width: 46rem; margin: 22px auto 0; text-align: left; }
     .abstract-body p { margin: 0; color: #506079; font-size: 17px; line-height: 1.7; }
     .abstract-body strong { color: #17345a; font-weight: 750; }
     .abstract-body p + p { margin-top: 16px; }
-    .subsection-head { margin-top: 22px; }
+    .subsection-head { margin-top: 64px; }
+    .case-figure { margin-top: 64px; }
+    .case-figure .art-frame { max-width: 760px; margin-inline: auto; }
+    .case-figure .art-frame img { cursor: zoom-in; }
     .qual-figures { margin-top: 76px; }
     .qual-figures .gallery-layout { margin-top: 28px; }
     .dark-section { background: var(--ink); color: var(--white); }
@@ -107,13 +110,14 @@
     .art-frame { border:1px solid rgba(181,255,241,.28); border-radius: 22px; padding: 13px; background: rgba(255,255,255,.045); }
     .art-frame img { border-radius:13px; width:100%; height:auto; background:#f5f5ef; }
     .art-caption { display:flex; justify-content:space-between; gap: 14px; color:#8290aa; font-size:11px; text-transform:uppercase; letter-spacing:.09em; margin-top: 12px; }
-    .step-row { margin-top: 36px; display:grid; grid-template-columns: repeat(6, 1fr); gap: 9px; }
-    .step { text-align:left; border:1px solid rgba(181,255,241,.16); border-radius: 13px; padding: 15px 13px; min-height: 105px; color:#7e8ca7; background:transparent; cursor:pointer; transition:.2s; }
+    .step-row { margin-top: 36px; display:grid; grid-template-columns: repeat(5, 1fr); gap: 9px; }
+    .step { text-align:left; border:1px solid rgba(181,255,241,.16); border-radius: 13px; padding: 15px 13px; min-height: 72px; color:#7e8ca7; background:transparent; cursor:pointer; transition:.2s; }
     .step:hover, .step.is-active { border-color:var(--cyan); background: rgba(113,225,208,.1); color:var(--white); }
-    .step strong { display:block; color:var(--cyan); font:700 11px ui-monospace,monospace; }
-    .step b { display:block; margin-top: 10px; font-size:13px; line-height:1.18; letter-spacing:-.02em; }
-    .loop-detail { margin-top: 17px; display:grid; grid-template-columns: 90px 1fr auto; align-items:center; gap: 20px; border-top: 1px solid rgba(181,255,241,.2); border-bottom: 1px solid rgba(181,255,241,.2); padding: 18px 0; }
-    .detail-index { font: 700 38px ui-monospace, monospace; color: rgba(181,255,241,.25); }
+    .step b { display:block; font-size:13px; line-height:1.18; letter-spacing:-.02em; }
+    .verify-module { width: 100%; margin-top: 9px; min-height: 0; display: flex; align-items: center; gap: 16px; }
+    .verify-module .verify-kicker { flex: none; color: var(--cyan); font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    .verify-module b { font-weight: 650; }
+    .loop-detail { margin-top: 17px; display:grid; grid-template-columns: 1fr auto; align-items:center; gap: 20px; border-top: 1px solid rgba(181,255,241,.2); border-bottom: 1px solid rgba(181,255,241,.2); padding: 18px 0; }
     .detail-copy strong { display:block; font-size:17px; }
     .detail-copy span { color:#8e9ab2; font-size:13px; }
     .detail-tag { padding: 8px 10px; border-radius: 8px; color:var(--ink); background:var(--lime); font-size:10px; letter-spacing:.1em; font-weight:900; text-transform:uppercase; }
@@ -139,7 +143,7 @@
     .chart-card img { width:100%; image-rendering:auto; border-radius: 10px; }
     .chart-caption { margin: 11px 2px 0; color:#748098; font-size:11px; line-height:1.4; }
     .chart-card .metric-bars { padding: 16px 10px 4px; }
-    .scope { background: #f0eee5; }
+    .method-scope { margin-top: 64px; }
     .scene-band { background: #e7f2ed; }
     .placed-table { margin-top: 40px; }
     .placed-table + .placed-table { margin-top: 48px; }
@@ -215,8 +219,8 @@
       .signal-inner > span { display:block; margin-top:6px; }
       .metric-strip { grid-template-columns:1fr; }
       .step-row { grid-template-columns:repeat(2,1fr); }
-      .loop-detail { grid-template-columns: 55px 1fr; }
-      .detail-tag { grid-column:2; justify-self:start; }
+      .loop-detail { grid-template-columns: 1fr; }
+      .detail-tag { justify-self:start; }
       .bar-row { grid-template-columns: 93px 1fr 43px; gap:8px; }
       .gallery-tabs { grid-template-columns:1fr; }
       .gallery-meta, .footer-inner { flex-direction:column; }
@@ -253,9 +257,9 @@
     .btn-primary { background: var(--cyan); color: var(--ink); }
     .btn-secondary { color: var(--ink); border-color: rgba(23,52,90,.23); background: rgba(255,255,255,.58); }
     .btn-secondary:hover { background: #fff; }
-    .signal { background: #dff3eb; color: var(--ink); }
+    .signal { background: #e7f2ed; color: var(--ink); }
     .signal-flow i { background: var(--cyan-2); }
-    .dark-section { background: #e7f2ed; color: var(--ink); }
+    .dark-section { background: #fbfaf6; color: var(--ink); }
     .dark-section .section-kicker { color: #238b81; }
     .dark-section .section-title em { color: #238b81; }
     .method-copy { color: #5e7189; }
@@ -263,21 +267,20 @@
     .art-caption { color: #71859c; }
     .step { border-color: rgba(23,127,131,.22); color: #667b92; }
     .step:hover, .step.is-active { border-color: #238b81; background: rgba(84,203,187,.14); color: var(--ink); }
-    .step strong { color: #238b81; }
+    .verify-module .verify-kicker { color: #238b81; }
     .loop-detail { border-color: rgba(23,127,131,.26); }
-    .detail-index { color: rgba(23,127,131,.45); }
     .detail-copy span { color: #667b92; }
     .detail-tag { background: var(--orange); }
     .fidelity { background: #f0eee5; }
     .metric-card { background: rgba(255,255,255,.68); }
-    .gallery { background: #f2eee5; color: var(--ink); }
+    .gallery { background: #fbfaf6; color: var(--ink); }
     .gallery .section-kicker { color: #b86a1d; }
     .gallery .section-title em { color: #b86a1d; }
     .gallery-tab { border-color: rgba(23,52,90,.16); color: #667b92; background: rgba(255,255,255,.55); }
     .gallery-tab:hover, .gallery-tab.is-active { color: var(--ink); border-color: #e49a4a; background: rgba(242,173,98,.14); }
     .gallery-display .art-frame { border-color: rgba(228,154,74,.35); }
     .gallery-meta { color: #71859c; }
-    .citation { background: #e5f1ed; color: var(--ink); }
+    .citation { background: #e7f2ed; color: var(--ink); }
     .citation-copy { color: #5e7189; }
     .citation-copy a { color: #177f83; }
     .bib { background: rgba(255,255,255,.76); border-color: rgba(23,127,131,.24); color: #425b78; }
@@ -288,7 +291,7 @@
   </style>
 
   <style id="demo-styles">
-    .demos { background: #fbfaf6; }
+    .demos, .baselines { background: #e7f2ed; }
     .demo-lead { max-width: 680px; margin: 18px 0 0; color: #5e7189; font-size: 17px; }
     .scene-switch { margin-top: 32px; display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; }
     .scene-tab { flex: 0 0 auto; border: 1px solid rgba(23,52,90,.16); background: rgba(255,255,255,.72); color: #5d7390; border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 750; cursor: pointer; }
@@ -379,17 +382,12 @@
       <div class="section-inner">
         <div class="method-intro reveal"><div><div class="section-kicker">02 · Method</div><h2 class="section-title">An agent that <em>builds, checks,</em> and builds again.</h2></div><p class="method-copy">Instead of a fixed pipeline, a router agent maintains a structured world state, delegates to specialized tools, and uses verification feedback to decide what to revisit next.</p></div>
         <div class="method-art reveal"><div class="art-frame"><img src="framework-v5.png" width="4800" height="2700" alt="WorldMirror framework diagram showing the agentic real-to-sim reconstruction loop" loading="lazy" decoding="async" /></div></div>
-        <div class="step-row reveal" role="tablist" aria-label="WorldMirror construction steps"><button class="step is-active" data-step="0"><strong>00</strong><b>Read demonstration</b></button><button class="step" data-step="1"><strong>01</strong><b>Decompose scene</b></button><button class="step" data-step="2"><strong>02</strong><b>Generate assets</b></button><button class="step" data-step="3"><strong>03</strong><b>Calibrate camera</b></button><button class="step" data-step="4"><strong>04</strong><b>Assemble world</b></button><button class="step" data-step="5"><strong>05</strong><b>Probe &amp; validate</b></button></div>
-        <div class="loop-detail reveal" aria-live="polite"><div class="detail-index">00</div><div class="detail-copy"><strong>Read the demonstration</strong><span>Ground the world state in the observed scene, instruction, and robot trajectory.</span></div><div class="detail-tag">Observe</div></div>
-      </div>
-    </section>
-
-    <section class="section scope" id="scope">
-      <div class="section-inner">
-        <div class="reveal">
-          <div class="section-kicker">Scope</div>
-          <h2 class="section-title">More than a <em>renderer.</em></h2>
-          <p class="demo-lead">WorldMirror is not only a renderer; the checkmarks show which real-to-sim systems actually replay a demonstration and close the loop.</p>
+        <div class="step-row reveal" role="tablist" aria-label="Tools the router can call"><button class="step is-active" data-step="0"><b>Read demonstration</b></button><button class="step" data-step="1"><b>Decompose scene</b></button><button class="step" data-step="2"><b>Generate assets</b></button><button class="step" data-step="3"><b>Calibrate camera</b></button><button class="step" data-step="4"><b>Assemble world</b></button></div>
+        <button class="step verify-module reveal" data-step="5" type="button"><span class="verify-kicker">Verification</span><b>Judge the reconstructed world, then return the feedback to the router.</b></button>
+        <div class="loop-detail reveal" aria-live="polite"><div class="detail-copy"><strong>Read the demonstration</strong><span>Ground the world state in the observed scene, instruction, and robot trajectory.</span></div><div class="detail-tag">Observe</div></div>
+        <div class="method-scope reveal" id="scope">
+          <h2 class="section-title">What real-to-sim systems <em>can do.</em></h2>
+          <p class="demo-lead">Table 1 marks which real-to-sim systems reconstruct the scene, replay a demonstration, and close the loop.</p>
         </div>
         <figure class="paper-table-block reveal">
           <figcaption>Table 1</figcaption>
@@ -416,7 +414,7 @@
                   <td class="mark yes" aria-label="Yes">✓</td>
                   <td class="mark yes" aria-label="Yes">✓</td>
                   <td class="mark no" aria-label="No">✗</td>
-                  <td class="mark no" aria-label="No">✗</td>
+                  <td class="mark yes" aria-label="Yes">✓</td>
                   <td class="mark yes wm" aria-label="Yes">✓</td>
                 </tr>
                 <tr>
@@ -438,6 +436,16 @@
                   <td class="mark no" aria-label="No">✗</td>
                   <td class="mark yes" aria-label="Yes">✓</td>
                   <td class="mark yes" aria-label="Yes">✓</td>
+                  <td class="mark yes wm" aria-label="Yes">✓</td>
+                </tr>
+                <tr>
+                  <th scope="row">Camera-Pose-Anchored World Representation</th>
+                  <td class="mark no" aria-label="No">✗</td>
+                  <td class="mark no" aria-label="No">✗</td>
+                  <td class="mark no" aria-label="No">✗</td>
+                  <td class="mark no" aria-label="No">✗</td>
+                  <td class="mark no" aria-label="No">✗</td>
+                  <td class="mark no" aria-label="No">✗</td>
                   <td class="mark yes wm" aria-label="Yes">✓</td>
                 </tr>
                 <tr>
@@ -510,7 +518,7 @@
 
     <section class="section scene-band" id="scene3d">
       <div class="section-inner">
-        <div class="reveal"><div class="section-kicker">Scene</div><h2 class="section-title">Turn the reconstructed <em>world.</em></h2><p class="demo-lead">Seven DROID scenes, reconstructed the same way. The photo stays in the corner so the real first frame can be compared with the orbit. Drag to turn the full circle, and scroll to move closer.</p></div>
+        <div class="reveal"><div class="section-kicker">Scene</div><h2 class="section-title">The reconstructed world, <em>from every side.</em></h2><p class="demo-lead">Seven DROID scenes, reconstructed the same way. The photo stays in the corner so the real first frame can be compared with the orbit. Drag to turn the full circle, and scroll to move closer.</p></div>
         <div class="scene-switch" id="splatSwitch" role="tablist" aria-label="Reconstructed scenes"></div>
         <div class="splat-stage" id="splatStage">
           <figure class="splat-ref" id="splatRef"><img id="splatRefImg" alt="Real first frame of the selected scene"><figcaption><span>Real</span><span>First frame</span></figcaption></figure>
@@ -522,7 +530,7 @@
 
     <section class="section baselines" id="baselines">
       <div class="section-inner">
-        <div class="reveal"><div class="section-kicker">Comparison</div><h2 class="section-title">The same scene, <em>five ways.</em></h2><p class="demo-lead">The exterior camera, in the paper’s order. Every method has a first frame. A replay plays underneath only when that method has a clip. Wrist views stay in the section above, where the real demonstration and the WorldMirror replay are paired.</p></div>
+        <div class="reveal"><div class="section-kicker">Comparison</div><h2 class="section-title">The same scene, <em>four reconstructions.</em></h2><p class="demo-lead">The recording next to RoboSnap, RoLA, GPT-6 Astra, and WorldMirror.</p></div>
         <div class="scene-switch" id="baseSwitch" role="tablist" aria-label="Comparison scenes"></div>
         <div class="method-board" id="baseBoard">
           <article class="method-card"><h3>Real</h3><figure class="shot"><img class="zoomable" data-still="gt" alt=""></figure><figure class="shot"><video data-video="gt" autoplay muted playsinline loop controls preload="none" aria-label="Real clip"></video><div class="clip-missing" data-empty="gt" hidden>No replay clip</div></figure></article>
@@ -538,63 +546,6 @@
     <section class="section gallery" id="qualitative">
       <div class="section-inner">
         <div class="reveal"><div class="section-kicker">04 · Qualitative</div></div>
-        <div class="reveal subsection-head" id="evidence"><h2 class="section-title">Fidelity is a <em>three-part contract.</em></h2></div>
-        <div class="metric-strip"><article class="metric-card cyan reveal"><span>Motion replay</span><strong>1.79 cm</strong><p>Displacement error when the recorded trajectory is replayed in Isaac Sim.</p></article><article class="metric-card orange reveal"><span>Physical interaction</span><strong>0.873</strong><p>Contact F1 during that same replay.</p></article><article class="metric-card lime reveal"><span>Replay success</span><strong>100%</strong><p>Recorded trajectories that complete in simulation, without retargeting.</p></article></div>
-        <div class="evidence-grid"><div class="evidence-copy reveal"><h3>The recorded motion still fits the reconstructed world.</h3><p>The comparison is trajectory replay in Isaac Sim, not a real-robot policy evaluation. Lower displacement error means the replay stays closer to the demonstration.</p></div><div class="chart-card reveal"><div class="metric-bars"><div class="bar-row"><label>WorldMirror</label><div class="bar-track"><div class="bar-fill" data-width="94%"></div></div><small>1.79</small></div><div class="bar-row"><label>GPT-6 Astra</label><div class="bar-track"><div class="bar-fill" data-width="48%"></div></div><small>11.17</small></div><div class="bar-row"><label>RoLA</label><div class="bar-track"><div class="bar-fill" data-width="18%"></div></div><small>24.70</small></div></div><p class="chart-caption">Displacement error in centimeters. Longer bars correspond to lower error.</p></div></div>
-        <div class="placed-table reveal" id="motion-replay">
-          <p class="table-lead">The cards above are the headline of this table: trajectory replay in Isaac Sim, not a real-robot policy result.</p>
-          <figure class="paper-table-block">
-            <figcaption>Table 4</figcaption>
-            <div class="paper-table-scroll" tabindex="0">
-              <table class="paper-table">
-                <thead>
-                  <tr>
-                    <th scope="col" class="left" rowspan="2">Method</th>
-                    <th scope="colgroup" class="center" colspan="4">Motion Replay</th>
-                    <th scope="colgroup" class="center" colspan="2">Physical Interaction</th>
-                  </tr>
-                  <tr>
-                    <th scope="col">Disp. (cm)↓</th>
-                    <th scope="col">Final (cm)↓</th>
-                    <th scope="col">Dir. (°)↓</th>
-                    <th scope="col">DTW (cm)↓</th>
-                    <th scope="col">F1↑</th>
-                    <th scope="col">SR↑</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">RoLA <span class="cite">(Zhao et al., 2025)</span></th>
-                    <td class="num">24.70</td>
-                    <td class="num">40.80</td>
-                    <td class="num">53.00</td>
-                    <td class="num">10.30</td>
-                    <td class="num">–</td>
-                    <td class="num">–</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">GPT-6 Astra <span class="cite">(OpenAI, 2026)</span></th>
-                    <td class="num">11.17</td>
-                    <td class="num">21.98</td>
-                    <td class="num">81.30</td>
-                    <td class="num">10.82</td>
-                    <td class="num">0.653</td>
-                    <td class="num">40%</td>
-                  </tr>
-                  <tr class="wm">
-                    <th scope="row">WorldMirror</th>
-                    <td class="num">1.79</td>
-                    <td class="num">5.83</td>
-                    <td class="num">10.90</td>
-                    <td class="num">1.64</td>
-                    <td class="num">0.873</td>
-                    <td class="num">100%</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </figure>
-        </div>
         <div class="placed-table reveal" id="appearance">
           <p class="table-lead">Appearance is measured on the same ten exterior views.</p>
           <figure class="paper-table-block">
@@ -711,6 +662,182 @@
                 </tbody>
               </table>
             </div>
+          </figure>
+        </div>
+        <div class="reveal subsection-head" id="evidence"><h2 class="section-title">Fidelity is a <em>three-part contract.</em></h2></div>
+        <div class="metric-strip"><article class="metric-card cyan reveal"><span>Motion replay</span><strong>1.79 cm</strong><p>Displacement error when the recorded trajectory is replayed in Isaac Sim.</p></article><article class="metric-card orange reveal"><span>Physical interaction</span><strong>0.873</strong><p>Contact F1 during that same replay.</p></article><article class="metric-card lime reveal"><span>Replay success</span><strong>100%</strong><p>Recorded trajectories that complete in simulation, without retargeting.</p></article></div>
+        <div class="evidence-grid"><div class="evidence-copy reveal"><h3>The recorded motion still fits the reconstructed world.</h3><p>The comparison is trajectory replay in Isaac Sim, not a real-robot policy evaluation. Lower displacement error means the replay stays closer to the demonstration.</p></div><div class="chart-card reveal"><div class="metric-bars"><div class="bar-row"><label>WorldMirror</label><div class="bar-track"><div class="bar-fill" data-width="94%"></div></div><small>1.79</small></div><div class="bar-row"><label>GPT-6 Astra</label><div class="bar-track"><div class="bar-fill" data-width="48%"></div></div><small>11.17</small></div><div class="bar-row"><label>RoLA</label><div class="bar-track"><div class="bar-fill" data-width="18%"></div></div><small>24.70</small></div></div><p class="chart-caption">Displacement error in centimeters. Longer bars correspond to lower error.</p></div></div>
+        <div class="placed-table reveal" id="motion-replay">
+          <p class="table-lead">The cards above are the headline of this table: trajectory replay in Isaac Sim, not a real-robot policy result.</p>
+          <figure class="paper-table-block">
+            <figcaption>Table 4</figcaption>
+            <div class="paper-table-scroll" tabindex="0">
+              <table class="paper-table">
+                <thead>
+                  <tr>
+                    <th scope="col" class="left" rowspan="2">Method</th>
+                    <th scope="colgroup" class="center" colspan="4">Motion Replay</th>
+                    <th scope="colgroup" class="center" colspan="2">Physical Interaction</th>
+                  </tr>
+                  <tr>
+                    <th scope="col">Disp. (cm)↓</th>
+                    <th scope="col">Final (cm)↓</th>
+                    <th scope="col">Dir. (°)↓</th>
+                    <th scope="col">DTW (cm)↓</th>
+                    <th scope="col">F1↑</th>
+                    <th scope="col">SR↑</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">RoLA <span class="cite">(Zhao et al., 2025)</span></th>
+                    <td class="num">24.70</td>
+                    <td class="num">40.80</td>
+                    <td class="num">53.00</td>
+                    <td class="num">10.30</td>
+                    <td class="num">–</td>
+                    <td class="num">–</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">GPT-6 Astra <span class="cite">(OpenAI, 2026)</span></th>
+                    <td class="num">11.17</td>
+                    <td class="num">21.98</td>
+                    <td class="num">81.30</td>
+                    <td class="num">10.82</td>
+                    <td class="num">0.653</td>
+                    <td class="num">40%</td>
+                  </tr>
+                  <tr class="wm">
+                    <th scope="row">WorldMirror</th>
+                    <td class="num">1.79</td>
+                    <td class="num">5.83</td>
+                    <td class="num">10.90</td>
+                    <td class="num">1.64</td>
+                    <td class="num">0.873</td>
+                    <td class="num">100%</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </figure>
+        </div>
+        <div class="placed-table reveal" id="refinement">
+          <p class="table-lead">Effect of verification-driven adaptive refinement on replay performance. One-pass performs reconstruction followed by a single replay attempt. Fixed Iterative repeatedly applies refinement without failure-aware diagnosis. Full WorldMirror performs structured failure diagnosis and targeted refinement.</p>
+          <figure class="paper-table-block">
+            <figcaption>Table 5</figcaption>
+            <div class="paper-table-scroll" tabindex="0">
+              <table class="paper-table">
+                <thead>
+                  <tr>
+                    <th scope="col" class="left">Strategy</th>
+                    <th scope="col">Success ↑</th>
+                    <th scope="col">Final (cm)↓</th>
+                    <th scope="col">Trans. (cm)↓</th>
+                    <th scope="col">Lift (cm)↓</th>
+                    <th scope="col">Dir. (°)↓</th>
+                    <th scope="col">DTW (cm)↓</th>
+                    <th scope="col">Replay Iter. ↓</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">One-pass</th>
+                    <td class="mark no" aria-label="No">✗</td>
+                    <td class="num">33.86</td>
+                    <td class="num">0</td>
+                    <td class="num">0</td>
+                    <td class="num">–</td>
+                    <td class="num">14.88</td>
+                    <td class="num">1</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Fixed Iterative</th>
+                    <td class="mark no" aria-label="No">✗</td>
+                    <td class="num">31.77</td>
+                    <td class="num">–</td>
+                    <td class="num">–</td>
+                    <td class="num">13.9</td>
+                    <td class="num">13.90</td>
+                    <td class="num">2</td>
+                  </tr>
+                  <tr class="wm">
+                    <th scope="row"><strong>Full</strong></th>
+                    <td class="mark yes wm" aria-label="Yes">✓</td>
+                    <td class="num"><strong>2.34</strong></td>
+                    <td class="num"><strong>32.98</strong></td>
+                    <td class="num"><strong>11.11</strong></td>
+                    <td class="num"><strong>3.70</strong></td>
+                    <td class="num"><strong>0.95</strong></td>
+                    <td class="num"><strong>4</strong></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </figure>
+        </div>
+        <div class="placed-table reveal" id="components">
+          <p class="table-lead">Component ablation of WorldMirror on the rail manipulation task. The ablations remove stateful memory, adaptive routing, or feedback-driven refinement. The latter corresponds to the One-pass setting, which performs only one replay without subsequent refinement.</p>
+          <figure class="paper-table-block">
+            <figcaption>Table 6</figcaption>
+            <div class="paper-table-scroll" tabindex="0">
+              <table class="paper-table">
+                <thead>
+                  <tr>
+                    <th scope="col" class="left">Variant</th>
+                    <th scope="col">Success ↑</th>
+                    <th scope="col">Final (cm)↓</th>
+                    <th scope="col">Trans. (cm)↓</th>
+                    <th scope="col">Lift (cm)↓</th>
+                    <th scope="col">Dir. (°)↓</th>
+                    <th scope="col">DTW (cm)↓</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="wm">
+                    <th scope="row"><strong>Full</strong></th>
+                    <td class="mark yes wm" aria-label="Yes">✓</td>
+                    <td class="num"><strong>2.34</strong></td>
+                    <td class="num"><strong>32.98</strong></td>
+                    <td class="num"><strong>11.11</strong></td>
+                    <td class="num"><strong>3.70</strong></td>
+                    <td class="num"><strong>0.95</strong></td>
+                  </tr>
+                  <tr>
+                    <th scope="row">w/o Stateful Memory</th>
+                    <td class="mark yes" aria-label="Yes">✓</td>
+                    <td class="num">2.35</td>
+                    <td class="num">33.00</td>
+                    <td class="num">11.23</td>
+                    <td class="num">3.75</td>
+                    <td class="num">0.97</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">w/o Adaptive Routing</th>
+                    <td class="mark no" aria-label="No">✗</td>
+                    <td class="num">9.86</td>
+                    <td class="num">42.23</td>
+                    <td class="num">6.45</td>
+                    <td class="num">7.93</td>
+                    <td class="num">2.60</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">w/o Feedback Refinement</th>
+                    <td class="mark no" aria-label="No">✗</td>
+                    <td class="num">33.86</td>
+                    <td class="num">0</td>
+                    <td class="num">0</td>
+                    <td class="num">–</td>
+                    <td class="num">14.88</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </figure>
+        </div>
+        <div class="case-figure reveal">
+          <p class="table-lead">Without verification feedback, the object stays where it started. Full WorldMirror diagnoses the failure and refines until the object reaches the target placement.</p>
+          <figure class="paper-table-block">
+            <div class="art-frame"><img class="zoomable" src="failure_case_diagnosis.png" width="1135" height="1312" alt="Failure diagnosis on a rail task. Without verification feedback the object stays still. Full WorldMirror diagnoses the failure and the object reaches the target." loading="lazy" decoding="async" /></div>
           </figure>
         </div>
         <div class="qual-figures"><div class="reveal"><h2 class="section-title">The mirror should hold up <em>frame by frame.</em></h2></div><div class="gallery-layout"><div class="gallery-tabs reveal"><button class="gallery-tab is-active" data-image="4scene_methods.png" data-alt="Four scene comparisons across GT, RoboSnap, RoLA, GPT-6 Astra, and WorldMirror" data-tall="false"><strong>Scene fidelity</strong><span>Real appearance, layout, and object placement.</span></button><button class="gallery-tab" data-image="wrist_timeline.png" data-alt="Wrist-view timeline comparison for rigid, separable, and articulated objects" data-tall="true"><strong>Trajectory replay</strong><span>Correspondence over time, from first frame to completion.</span></button></div><div class="gallery-display reveal"><div class="art-frame"><img id="galleryImage" class="zoomable" src="4scene_methods.png" alt="Four scene comparisons across GT, RoboSnap, RoLA, GPT-6 Astra, and WorldMirror" loading="lazy" decoding="async" /></div></div></div></div>
@@ -1154,13 +1281,12 @@
       ['Generate editable assets','Invoke specialized image and 3D tools for the components that need to move.','Create'],
       ['Calibrate the camera','Optimize the camera-pose transform that anchors every entity to the observed frame.','Align'],
       ['Assemble the world','Write the executable world program: assets, poses, camera, and robot trajectory.','Execute'],
-      ['Probe and validate','Compare render, layout, contacts, and replay; route failures back for targeted refinement.','Verify']
+      ['Iterative verification','Judge reconstruction, spatial layout, and trajectory replay. The feedback returns to the router, which chooses what to revise.','Verify']
     ];
     const detail = document.querySelector('.loop-detail');
     document.querySelectorAll('.step').forEach(button => button.addEventListener('click', () => {
       document.querySelectorAll('.step').forEach(b => b.classList.remove('is-active')); button.classList.add('is-active');
       const i = Number(button.dataset.step), s = steps[i];
-      detail.querySelector('.detail-index').textContent = String(i).padStart(2,'0');
       detail.querySelector('.detail-copy strong').textContent = s[0];
       detail.querySelector('.detail-copy span').textContent = s[1];
       detail.querySelector('.detail-tag').textContent = s[2];
@@ -1735,7 +1861,7 @@
       await runStep(() => drainVideos());
     })();
 
-    const navTarget = { story: 'story', abstract: 'abstract', method: 'method', scope: 'method', replay: 'replay', scene3d: 'replay', baselines: 'replay', qualitative: 'qualitative', citation: 'citation' };
+    const navTarget = { story: 'story', abstract: 'abstract', method: 'method', replay: 'replay', scene3d: 'replay', baselines: 'replay', qualitative: 'qualitative', citation: 'citation' };
     const sections = [...document.querySelectorAll('main section[id]')];
     const linkMap = new Map([...document.querySelectorAll('.nav-links a[href^="#"]')].map(a => [a.getAttribute('href').slice(1), a]));
     const activeObserver = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) { const key = navTarget[entry.target.id]; linkMap.forEach(a => a.classList.remove('active')); if (key) linkMap.get(key)?.classList.add('active'); } }), {rootMargin:'-40% 0px -50%'});
