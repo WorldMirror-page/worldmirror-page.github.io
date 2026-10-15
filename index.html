@@ -506,13 +506,13 @@
         <div class="compare">
           <div class="compare-col">
             <h3>Real demonstration<span>Recorded DROID views</span></h3>
-            <figure class="shot"><video id="realExt" autoplay muted playsinline loop controls preload="auto" aria-label="Real exterior camera"></video></figure>
-            <figure class="shot"><video id="realWrist" autoplay muted playsinline loop controls preload="auto" aria-label="Real wrist camera"></video></figure>
+            <figure class="shot"><video id="realExt" autoplay muted playsinline loop controls preload="none" fetchpriority="high" aria-label="Real exterior camera"></video></figure>
+            <figure class="shot"><video id="realWrist" autoplay muted playsinline loop controls preload="none" aria-label="Real wrist camera"></video></figure>
           </div>
           <div class="compare-col">
             <h3>WorldMirror replay<span>Same trajectory, no retargeting</span></h3>
-            <figure class="shot"><video id="simExt" autoplay muted playsinline loop controls preload="auto" aria-label="Replayed exterior camera"></video></figure>
-            <figure class="shot"><video id="simWrist" autoplay muted playsinline loop controls preload="auto" aria-label="Replayed wrist camera"></video></figure>
+            <figure class="shot"><video id="simExt" autoplay muted playsinline loop controls preload="none" aria-label="Replayed exterior camera"></video></figure>
+            <figure class="shot"><video id="simWrist" autoplay muted playsinline loop controls preload="none" aria-label="Replayed wrist camera"></video></figure>
           </div>
         </div>
         <div class="demo-foot"><p class="scene-caption" id="sceneCaption"></p></div>
@@ -536,11 +536,11 @@
         <div class="reveal"><div class="section-kicker">Comparison</div><h2 class="section-title">The same scene, <em>five ways.</em></h2><p class="demo-lead">The exterior camera, in the paper’s order. Every method has a first frame. A replay plays underneath only when that method has a clip. Wrist views stay in the section above, where the real demonstration and the WorldMirror replay are paired.</p></div>
         <div class="scene-switch" id="baseSwitch" role="tablist" aria-label="Comparison scenes"></div>
         <div class="method-board" id="baseBoard">
-          <article class="method-card"><h3>Real</h3><figure class="shot"><img class="zoomable" data-still="gt" alt=""></figure><figure class="shot"><video data-video="gt" autoplay muted playsinline loop controls preload="auto" aria-label="Real clip"></video><div class="clip-missing" data-empty="gt" hidden>No replay clip</div></figure></article>
-          <article class="method-card"><h3>RoboSnap</h3><figure class="shot"><img class="zoomable" data-still="robosnap" alt=""></figure><figure class="shot"><video data-video="robosnap" autoplay muted playsinline loop controls preload="auto" aria-label="RoboSnap replay" hidden></video><div class="clip-missing" data-empty="robosnap">No replay clip</div></figure></article>
-          <article class="method-card"><h3>RoLA</h3><figure class="shot"><img class="zoomable" data-still="rola" alt=""></figure><figure class="shot"><video data-video="rola" autoplay muted playsinline loop controls preload="auto" aria-label="RoLA replay"></video><div class="clip-missing" data-empty="rola" hidden>No replay clip</div></figure></article>
-          <article class="method-card"><h3>GPT-6 Astra</h3><figure class="shot"><img class="zoomable" data-still="gpt6" alt=""></figure><figure class="shot"><video data-video="gpt6" autoplay muted playsinline loop controls preload="auto" aria-label="GPT-6 Astra replay"></video><div class="clip-missing" data-empty="gpt6" hidden>No replay clip</div></figure></article>
-          <article class="method-card is-ours"><h3>WorldMirror</h3><figure class="shot"><img class="zoomable" data-still="ours" alt=""></figure><figure class="shot"><video data-video="ours" autoplay muted playsinline loop controls preload="auto" aria-label="WorldMirror replay"></video><div class="clip-missing" data-empty="ours" hidden>No replay clip</div></figure></article>
+          <article class="method-card"><h3>Real</h3><figure class="shot"><img class="zoomable" data-still="gt" alt=""></figure><figure class="shot"><video data-video="gt" autoplay muted playsinline loop controls preload="none" aria-label="Real clip"></video><div class="clip-missing" data-empty="gt" hidden>No replay clip</div></figure></article>
+          <article class="method-card"><h3>RoboSnap</h3><figure class="shot"><img class="zoomable" data-still="robosnap" alt=""></figure><figure class="shot"><video data-video="robosnap" autoplay muted playsinline loop controls preload="none" aria-label="RoboSnap replay" hidden></video><div class="clip-missing" data-empty="robosnap">No replay clip</div></figure></article>
+          <article class="method-card"><h3>RoLA</h3><figure class="shot"><img class="zoomable" data-still="rola" alt=""></figure><figure class="shot"><video data-video="rola" autoplay muted playsinline loop controls preload="none" aria-label="RoLA replay"></video><div class="clip-missing" data-empty="rola" hidden>No replay clip</div></figure></article>
+          <article class="method-card"><h3>GPT-6 Astra</h3><figure class="shot"><img class="zoomable" data-still="gpt6" alt=""></figure><figure class="shot"><video data-video="gpt6" autoplay muted playsinline loop controls preload="none" aria-label="GPT-6 Astra replay"></video><div class="clip-missing" data-empty="gpt6" hidden>No replay clip</div></figure></article>
+          <article class="method-card is-ours"><h3>WorldMirror</h3><figure class="shot"><img class="zoomable" data-still="ours" alt=""></figure><figure class="shot"><video data-video="ours" autoplay muted playsinline loop controls preload="none" aria-label="WorldMirror replay"></video><div class="clip-missing" data-empty="ours" hidden>No replay clip</div></figure></article>
         </div>
         <div class="demo-foot"><p class="scene-caption" id="baseCaption"></p></div>
       </div>
@@ -1049,7 +1049,10 @@
     });
     const requestedScene = new URLSearchParams(location.search).get("scene");
     const initialScene = Math.max(0, splatScenes.findIndex((scene) => scene[0].toLowerCase() === requestedScene || scene[2] === requestedScene));
-    window.whenHeroReady(() => showSplatScene(initialScene));
+    const startInitialScene = () => showSplatScene(initialScene);
+    const videosFirst = window.visibleVideosReady;
+    if (videosFirst && typeof videosFirst.then === "function") videosFirst.then(startInitialScene, startInitialScene);
+    else window.whenHeroReady(startInitialScene);
     }
   </script>
   <script>
@@ -1196,7 +1199,8 @@
       simWrist: document.getElementById('simWrist')
     };
     const syncToken = { replay: 0, base: 0 };
-    const syncAbort = new WeakMap();
+    const groupAbort = { replay: null, base: null };
+    let startupEpoch = 0;
     function bindUserPause(video) {
       if (!video || video.dataset.userPauseBound) return;
       video.dataset.userPauseBound = '1';
@@ -1208,27 +1212,49 @@
         delete video.dataset.userPaused;
       });
     }
-    function playSynced(group, clips) {
+    function waitUntilPlayable(video, signal) {
+      const timeoutMs = 8000;
+      return new Promise(resolve => {
+        if (!video || video.error) { resolve('absent'); return; }
+        if (signal && signal.aborted) { resolve('aborted'); return; }
+        if (video.readyState >= 3) { resolve('canplay'); return; }
+        let settled = false;
+        let lastProgress = performance.now();
+        const finish = reason => {
+          if (settled) return;
+          settled = true;
+          video.removeEventListener('canplay', onReady);
+          video.removeEventListener('error', onError);
+          video.removeEventListener('progress', onProgress);
+          if (signal) signal.removeEventListener('abort', onAbort);
+          window.clearInterval(timer);
+          resolve(reason);
+        };
+        const onReady = () => finish('canplay');
+        const onError = () => finish('error');
+        const onProgress = () => { lastProgress = performance.now(); };
+        const onAbort = () => finish('aborted');
+        const timer = window.setInterval(() => {
+          if (signal && signal.aborted) finish('aborted');
+          else if (performance.now() - lastProgress >= timeoutMs) finish('timeout');
+        }, 250);
+        video.addEventListener('canplay', onReady);
+        video.addEventListener('error', onError);
+        video.addEventListener('progress', onProgress);
+        if (signal) signal.addEventListener('abort', onAbort);
+      });
+    }
+    async function playSynced(group, clips) {
       const generation = ++syncToken[group];
+      if (groupAbort[group]) groupAbort[group].abort();
+      const run = new AbortController();
+      groupAbort[group] = run;
       const list = clips.filter(clip => clip.video && clip.src && !clip.video.hidden);
       if (!list.length) return;
-      let pending = list.length;
-      const canPlay = clip => clip.video && !clip.video.error && !clip.video.hidden && clip.video.getAttribute('src');
-      const startAll = () => {
-        if (generation !== syncToken[group] || pending !== 0) return;
-        const playable = list.filter(canPlay);
-        playable.forEach(clip => {
-          const video = clip.video;
-          if (video.dataset.userPaused === '1') {
-            video.dataset.syncLive = '1';
-            return;
-          }
-          try { video.currentTime = 0; } catch (e) {}
-          video.dataset.syncLive = '1';
-          video.play().catch(() => {});
-        });
-      };
-      list.forEach(clip => {
+      const alive = () => generation === syncToken[group] && !run.signal.aborted;
+      for (let i = 0; i < list.length; i++) {
+        if (!alive()) return;
+        const clip = list[i];
         const video = clip.video;
         bindUserPause(video);
         delete video.dataset.userPaused;
@@ -1237,28 +1263,30 @@
         video.loop = true;
         video.playsInline = true;
         video.autoplay = true;
-        let settled = false;
-        const done = failed => {
-          if (settled || generation !== syncToken[group]) return;
-          settled = true;
-          if (!failed) video.pause();
-          pending -= 1;
-          if (pending === 0) startAll();
-        };
-        const previous = syncAbort.get(video);
-        if (previous) previous.abort();
-        if (video.getAttribute('src') === clip.src && video.readyState >= 1 && !video.error) {
-          syncAbort.delete(video);
-          done(false);
-          return;
-        }
-        const abort = new AbortController();
-        syncAbort.set(video, abort);
-        video.addEventListener('loadedmetadata', () => done(false), { signal: abort.signal });
-        video.addEventListener('error', () => done(true), { signal: abort.signal });
+        if (video.getAttribute('src') === clip.src && video.readyState >= 3 && !video.error) continue;
         video.pause();
+        video.preload = 'auto';
+        if (group === 'replay' && i === 0) {
+          video.fetchPriority = 'high';
+          video.setAttribute('fetchpriority', 'high');
+        }
         if (video.getAttribute('src') !== clip.src) video.src = clip.src;
         else video.load();
+        const reason = await waitUntilPlayable(video, run.signal);
+        if (!alive() || reason === 'aborted') return;
+        video.pause();
+      }
+      if (!alive()) return;
+      list.forEach(clip => {
+        const video = clip.video;
+        if (!video || video.error || video.hidden || !video.getAttribute('src')) return;
+        if (video.dataset.userPaused === '1') {
+          video.dataset.syncLive = '1';
+          return;
+        }
+        try { video.currentTime = 0; } catch (e) {}
+        video.dataset.syncLive = '1';
+        video.play().catch(() => {});
       });
     }
     function selectScene(index) {
@@ -1269,7 +1297,7 @@
         tab.setAttribute('aria-selected', on ? 'true' : 'false');
       });
       sceneCaption.textContent = scene[1];
-      playSynced('replay', ['realExt', 'realWrist', 'simExt', 'simWrist'].map((key, i) => {
+      return playSynced('replay', ['realExt', 'realWrist', 'simExt', 'simWrist'].map((key, i) => {
         const rel = scene[i + 2];
         const id = rel.split('/')[0];
         const fresh = i >= 2 ? freshReplay[id] : null;
@@ -1285,10 +1313,9 @@
       tab.className = 'scene-tab';
       tab.setAttribute('role', 'tab');
       tab.textContent = scene[0];
-      tab.addEventListener('click', () => selectScene(index));
+      tab.addEventListener('click', () => { startupEpoch += 1; selectScene(index); });
       sceneSwitch.appendChild(tab);
     });
-    window.whenHeroReady(() => selectScene(0));
 
     const baseRoot = 'baseline_source_stills/';
     const baselineScenes = [
@@ -1322,6 +1349,7 @@
       bindUserPause(baseVideos[key]);
     });
     function selectBaseline(index) {
+      if (groupAbort.base) groupAbort.base.abort();
       syncToken.base += 1;
       const scene = baselineScenes[index];
       baseSwitch.querySelectorAll('.scene-tab').forEach((tab, i) => {
@@ -1332,15 +1360,11 @@
       const clips = [];
       Object.entries(baseMethods).forEach(([key, file]) => {
         const stillSrc = `${baseRoot}${scene[0]}/${key}.png`;
+        baseStills[key].fetchPriority = 'low';
         baseStills[key].src = stillSrc;
         baseStills[key].alt = `${scene[1]}, ${key === 'gt' ? 'recorded frame' : 'reconstructed frame'}`;
         const video = baseVideos[key];
         const hasVideo = Boolean(file) && (key !== 'ours' || scene[3]);
-        const previous = syncAbort.get(video);
-        if (previous) {
-          previous.abort();
-          syncAbort.delete(video);
-        }
         delete video.dataset.syncLive;
         video.pause();
         if (!hasVideo) {
@@ -1358,7 +1382,7 @@
         clips.push({ video, src: freshOurs ? freshOurs + 'third_person.mp4' : `${baseRoot}${scene[0]}/${file}` });
       });
       baseCaption.textContent = scene[2];
-      playSynced('base', clips);
+      return playSynced('base', clips);
     }
     baselineScenes.forEach((scene, index) => {
       const tab = document.createElement('button');
@@ -1366,10 +1390,18 @@
       tab.className = 'scene-tab';
       tab.setAttribute('role', 'tab');
       tab.textContent = scene[1];
-      tab.addEventListener('click', () => selectBaseline(index));
+      tab.addEventListener('click', () => { startupEpoch += 1; selectBaseline(index); });
       baseSwitch.appendChild(tab);
     });
-    window.whenHeroReady(() => selectBaseline(0));
+    const splatStatusEl = document.getElementById('splatStatus');
+    window.visibleVideosReady = (async () => {
+      if (splatStatusEl) splatStatusEl.textContent = 'Loading videos…';
+      await new Promise(resolve => window.whenHeroReady(resolve));
+      const epoch = startupEpoch;
+      await selectScene(0);
+      if (epoch !== startupEpoch) return;
+      await selectBaseline(0);
+    })();
 
     const navTarget = { story: 'story', abstract: 'abstract', method: 'method', scope: 'method', replay: 'replay', scene3d: 'replay', baselines: 'replay', qualitative: 'qualitative', citation: 'citation' };
     const sections = [...document.querySelectorAll('main section[id]')];
