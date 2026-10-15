@@ -873,6 +873,7 @@
     let started = false;
     let busy = false;
     let queued = null;
+    let splatArmed = false;
     const configureGlass = (material) => {
       // RTX resolves the authored thin OmniGlass against scene reflections.
       // A generic WebGL environment turns the same white authored color into
@@ -973,23 +974,37 @@
       frameScene(scene);
       viewer.splatMesh.frustumCulled = false;
     };
-    const showSplatScene = async (index) => {
+    const markSplatTab = (active) => {
       splatSwitch.querySelectorAll(".scene-tab").forEach((tab, i) => {
-        const on = i === index;
+        const on = i === active;
         tab.classList.toggle("is-active", on);
         tab.setAttribute("aria-selected", on ? "true" : "false");
       });
+    };
+    const showSplatScene = async (index) => {
+      // Highlight immediately, but do not request the ply or glb until the
+      // replay and comparison videos have had their turn.
+      splatArmed = true;
+      markSplatTab(index);
       if (busy) {
         queued = index;
         return;
       }
       busy = true;
-      const scene = splatScenes[index];
-      splatCaption.textContent = scene[1];
-      splatRefImg.alt = "Real first frame, " + scene[0];
-      splatRefImg.src = "droid_scale20_real_first_frames/" + scene[2] + ".png";
-      status.textContent = "Loading " + scene[0] + "…";
+      let loaded = index;
       try {
+        const gate = window.visibleVideosReady;
+        if (gate && typeof gate.then === "function") await gate;
+        if (queued !== null) {
+          loaded = queued;
+          queued = null;
+          markSplatTab(loaded);
+        }
+        const scene = splatScenes[loaded];
+        splatCaption.textContent = scene[1];
+        splatRefImg.alt = "Real first frame, " + scene[0];
+        splatRefImg.src = "droid_scale20_real_first_frames/" + scene[2] + ".png";
+        status.textContent = "Loading " + scene[0] + "…";
         if (splatCount) {
           await viewer.removeSplatScene(0, false);
           splatCount = 0;
@@ -1028,7 +1043,7 @@
         console.error(error);
       } finally {
         busy = false;
-        if (queued !== null && queued !== index) {
+        if (queued !== null && queued !== loaded) {
           const next = queued;
           queued = null;
           showSplatScene(next);
@@ -1049,7 +1064,7 @@
     });
     const requestedScene = new URLSearchParams(location.search).get("scene");
     const initialScene = Math.max(0, splatScenes.findIndex((scene) => scene[0].toLowerCase() === requestedScene || scene[2] === requestedScene));
-    const startInitialScene = () => showSplatScene(initialScene);
+    const startInitialScene = () => { if (!splatArmed) showSplatScene(initialScene); };
     const videosFirst = window.visibleVideosReady;
     if (videosFirst && typeof videosFirst.then === "function") videosFirst.then(startInitialScene, startInitialScene);
     else window.whenHeroReady(startInitialScene);
@@ -1178,6 +1193,11 @@
       'iris-153900': '_invert_brightness_success_1080p_views/iris-153900-ext2/',
       'iliad-161943': '_invert_brightness_success_1080p_views/iliad-161943-ext2-rodin/'
     };
+    function freshClip(id, view) {
+      const folder = freshReplay[id];
+      if (!folder) return '';
+      return folder + (view === 'wrist' ? 'wrist.mp4' : 'third_person.mp4');
+    }
     const scenes = [
       ['Can', 'Kitchen sink, with a can at the faucet.', 'rpl-164606/original.mp4', 'rpl-164606/original_wrist.mp4', 'rpl-164606/replay_cam_recon.mp4', 'rpl-164606/replay_cam_wrist.mp4'],
       ['Block', 'Colored blocks on a wooden table.', 'rail-152727/original.mp4', 'rail-152727/original_wrist.mp4', 'rail-152727/replay_cam_recon.mp4', 'rail-152727/replay_cam_wrist.mp4'],
@@ -1200,7 +1220,13 @@
     };
     const syncToken = { replay: 0, base: 0 };
     const groupAbort = { replay: null, base: null };
-    let startupEpoch = 0;
+    const mediaBySrc = new Map();
+    let prefetchAbort = null;
+    let activePlaybacks = 0;
+    let replayRun = Promise.resolve();
+    let baseRun = Promise.resolve();
+    let replayUserPick = false;
+    let baselineUserPick = false;
     function bindUserPause(video) {
       if (!video || video.dataset.userPauseBound) return;
       video.dataset.userPauseBound = '1';
@@ -1234,8 +1260,15 @@
         const onError = () => finish('error');
         const onProgress = () => { lastProgress = performance.now(); };
         const onAbort = () => finish('aborted');
+        let lastEnd = video.buffered && video.buffered.length ? video.buffered.end(video.buffered.length - 1) : 0;
         const timer = window.setInterval(() => {
+          const end = video.buffered && video.buffered.length ? video.buffered.end(video.buffered.length - 1) : 0;
+          if (end > lastEnd + 0.01) {
+            lastEnd = end;
+            lastProgress = performance.now();
+          }
           if (signal && signal.aborted) finish('aborted');
+          else if (video.readyState >= 3) finish('canplay');
           else if (performance.now() - lastProgress >= timeoutMs) finish('timeout');
         }, 250);
         video.addEventListener('canplay', onReady);
@@ -1244,6 +1277,149 @@
         if (signal) signal.addEventListener('abort', onAbort);
       });
     }
+    const sleep = (ms) => new Promise(resolve => window.setTimeout(resolve, ms));
+    function inShot(video) {
+      return !!(video && video.closest && video.closest('figure.shot'));
+    }
+    function park(video) {
+      if (!video) return;
+      video.pause();
+      video.controls = false;
+      video.tabIndex = -1;
+      video.setAttribute('aria-hidden', 'true');
+      video.style.cssText = 'position:fixed;left:0;bottom:0;width:160px;height:90px;opacity:0;pointer-events:none;z-index:-1';
+      document.body.appendChild(video);
+    }
+    function copySlotPresentation(from, to) {
+      to.autoplay = true;
+      to.muted = true;
+      to.defaultMuted = true;
+      to.playsInline = true;
+      to.loop = true;
+      to.controls = true;
+      to.preload = 'auto';
+      to.removeAttribute('tabindex');
+      to.removeAttribute('aria-hidden');
+      to.style.cssText = '';
+      const label = from.getAttribute('aria-label');
+      if (label) to.setAttribute('aria-label', label);
+      const marker = from.getAttribute('data-video');
+      if (marker) {
+        to.setAttribute('data-video', marker);
+        if (from !== to) from.removeAttribute('data-video');
+      } else to.removeAttribute('data-video');
+      to.hidden = from.hidden;
+      const poster = from.getAttribute('poster');
+      if (poster) to.setAttribute('poster', poster);
+      else to.removeAttribute('poster');
+      const priority = from.getAttribute('fetchpriority');
+      if (priority) to.setAttribute('fetchpriority', priority);
+      else to.removeAttribute('fetchpriority');
+      if (from.id && from !== to) {
+        to.id = from.id;
+        from.removeAttribute('id');
+      }
+    }
+    function retarget(from, to) {
+      if (!from || !to || from === to) return;
+      Object.keys(demoVideos).forEach(key => { if (demoVideos[key] === from) demoVideos[key] = to; });
+      Object.keys(baseVideos).forEach(key => { if (baseVideos[key] === from) baseVideos[key] = to; });
+    }
+    function mountSrc(slot, src) {
+      if (!slot || !src) return slot;
+      const owner = mediaBySrc.get(src);
+      if (owner === slot) return slot;
+      if (owner && !inShot(owner)) {
+        copySlotPresentation(slot, owner);
+        slot.replaceWith(owner);
+        const previous = slot.getAttribute('src');
+        if (previous && mediaBySrc.get(previous) === slot) park(slot);
+        else slot.remove();
+        retarget(slot, owner);
+        bindUserPause(owner);
+        return owner;
+      }
+      if (slot.getAttribute('src') === src) {
+        if (!owner) mediaBySrc.set(src, slot);
+        return slot;
+      }
+      let target = slot;
+      const previous = slot.getAttribute('src');
+      if (previous && mediaBySrc.get(previous) === slot) {
+        target = document.createElement('video');
+        copySlotPresentation(slot, target);
+        slot.replaceWith(target);
+        park(slot);
+        retarget(slot, target);
+        bindUserPause(target);
+      }
+      target.preload = 'auto';
+      target.muted = true;
+      target.playsInline = true;
+      if (target.getAttribute('src') !== src) target.src = src;
+      if (!mediaBySrc.has(src)) mediaBySrc.set(src, target);
+      return target;
+    }
+    function bufferedThrough(video) {
+      if (!video || video.error) return true;
+      const duration = video.duration;
+      if (!Number.isFinite(duration) || duration <= 0 || !video.buffered.length) return false;
+      return video.buffered.end(video.buffered.length - 1) >= duration - 0.3;
+    }
+    function waitUntilBuffered(video) {
+      const timeoutMs = 8000;
+      return new Promise(resolve => {
+        if (!video || video.error || bufferedThrough(video)) { resolve('buffered'); return; }
+        let settled = false;
+        let lastProgress = performance.now();
+        let lastEnd = video.buffered.length ? video.buffered.end(video.buffered.length - 1) : 0;
+        const finish = reason => {
+          if (settled) return;
+          settled = true;
+          video.removeEventListener('progress', onProgress);
+          video.removeEventListener('error', onError);
+          window.clearInterval(timer);
+          resolve(reason);
+        };
+        const onProgress = () => {
+          lastProgress = performance.now();
+          if (bufferedThrough(video)) finish('buffered');
+        };
+        const onError = () => finish('error');
+        const timer = window.setInterval(() => {
+          const end = video.buffered.length ? video.buffered.end(video.buffered.length - 1) : 0;
+          if (end > lastEnd + 0.01) {
+            lastEnd = end;
+            lastProgress = performance.now();
+          }
+          if (bufferedThrough(video) || video.error) finish('buffered');
+          else if (performance.now() - lastProgress >= timeoutMs) finish('timeout');
+        }, 250);
+        video.addEventListener('progress', onProgress);
+        video.addEventListener('error', onError);
+      });
+    }
+    async function prefetchOne(src, signal) {
+      if (!src) return;
+      const existing = mediaBySrc.get(src);
+      if (existing) {
+        await waitUntilPlayable(existing, signal);
+        return;
+      }
+      if (signal && signal.aborted) return;
+      const video = document.createElement('video');
+      video.muted = true;
+      video.defaultMuted = true;
+      video.playsInline = true;
+      video.preload = 'auto';
+      video.setAttribute('playsinline', '');
+      park(video);
+      mediaBySrc.set(src, video);
+      video.src = src;
+      const nudge = () => { video.play().catch(() => {}); };
+      video.addEventListener('loadeddata', nudge, { once: true });
+      await waitUntilPlayable(video, signal);
+    }
     async function playSynced(group, clips) {
       const generation = ++syncToken[group];
       if (groupAbort[group]) groupAbort[group].abort();
@@ -1251,43 +1427,56 @@
       groupAbort[group] = run;
       const list = clips.filter(clip => clip.video && clip.src && !clip.video.hidden);
       if (!list.length) return;
-      const alive = () => generation === syncToken[group] && !run.signal.aborted;
-      for (let i = 0; i < list.length; i++) {
-        if (!alive()) return;
-        const clip = list[i];
-        const video = clip.video;
-        bindUserPause(video);
-        delete video.dataset.userPaused;
-        delete video.dataset.syncLive;
-        video.muted = true;
-        video.loop = true;
-        video.playsInline = true;
-        video.autoplay = true;
-        if (video.getAttribute('src') === clip.src && video.readyState >= 3 && !video.error) continue;
-        video.pause();
-        video.preload = 'auto';
-        if (group === 'replay' && i === 0) {
-          video.fetchPriority = 'high';
-          video.setAttribute('fetchpriority', 'high');
-        }
-        if (video.getAttribute('src') !== clip.src) video.src = clip.src;
-        else video.load();
-        const reason = await waitUntilPlayable(video, run.signal);
-        if (!alive() || reason === 'aborted') return;
-        video.pause();
+      activePlaybacks += 1;
+      if (prefetchAbort) {
+        prefetchAbort.abort();
+        prefetchAbort = null;
       }
-      if (!alive()) return;
-      list.forEach(clip => {
-        const video = clip.video;
-        if (!video || video.error || video.hidden || !video.getAttribute('src')) return;
-        if (video.dataset.userPaused === '1') {
-          video.dataset.syncLive = '1';
-          return;
+      try {
+        const alive = () => generation === syncToken[group] && !run.signal.aborted;
+        for (let i = 0; i < list.length; i++) {
+          if (!alive()) return;
+          const clip = list[i];
+          const video = mountSrc(clip.video, clip.src);
+          clip.video = video;
+          bindUserPause(video);
+          delete video.dataset.userPaused;
+          delete video.dataset.syncLive;
+          video.muted = true;
+          video.loop = true;
+          video.playsInline = true;
+          video.autoplay = true;
+          video.controls = true;
+          if (group === 'replay' && i === 0) {
+            video.fetchPriority = 'high';
+            video.setAttribute('fetchpriority', 'high');
+          }
+          const ready = video.getAttribute('src') === clip.src && video.readyState >= 3 && !video.error;
+          if (!ready) {
+            video.pause();
+            video.preload = 'auto';
+            if (video.getAttribute('src') !== clip.src) video.src = clip.src;
+            const reason = await waitUntilPlayable(video, run.signal);
+            if (!alive() || reason === 'aborted') return;
+            video.pause();
+          }
         }
-        try { video.currentTime = 0; } catch (e) {}
-        video.dataset.syncLive = '1';
-        video.play().catch(() => {});
-      });
+        if (!alive()) return;
+        list.forEach(clip => {
+          const video = clip.video;
+          if (!video || video.error || video.hidden || !video.getAttribute('src')) return;
+          if (video.dataset.userPaused === '1') {
+            video.dataset.syncLive = '1';
+            return;
+          }
+          try { video.currentTime = 0; } catch (e) {}
+          video.dataset.syncLive = '1';
+          video.controls = true;
+          video.play().catch(() => {});
+        });
+      } finally {
+        activePlaybacks -= 1;
+      }
     }
     function selectScene(index) {
       const scene = scenes[index];
@@ -1297,15 +1486,17 @@
         tab.setAttribute('aria-selected', on ? 'true' : 'false');
       });
       sceneCaption.textContent = scene[1];
-      return playSynced('replay', ['realExt', 'realWrist', 'simExt', 'simWrist'].map((key, i) => {
+      const job = playSynced('replay', ['realExt', 'realWrist', 'simExt', 'simWrist'].map((key, i) => {
         const rel = scene[i + 2];
         const id = rel.split('/')[0];
-        const fresh = i >= 2 ? freshReplay[id] : null;
+        const fresh = i >= 2 ? freshClip(id, i === 2 ? 'third' : 'wrist') : '';
         return {
           video: demoVideos[key],
-          src: fresh ? fresh + (i === 2 ? 'third_person.mp4' : 'wrist.mp4') : demoRoot + rel
+          src: fresh || (demoRoot + rel)
         };
       }));
+      replayRun = Promise.resolve(job).then(() => {}, () => {});
+      return job;
     }
     scenes.forEach((scene, index) => {
       const tab = document.createElement('button');
@@ -1313,7 +1504,7 @@
       tab.className = 'scene-tab';
       tab.setAttribute('role', 'tab');
       tab.textContent = scene[0];
-      tab.addEventListener('click', () => { startupEpoch += 1; selectScene(index); });
+      tab.addEventListener('click', () => { replayUserPick = true; selectScene(index); });
       sceneSwitch.appendChild(tab);
     });
 
@@ -1368,9 +1559,22 @@
         delete video.dataset.syncLive;
         video.pause();
         if (!hasVideo) {
-          video.hidden = true;
-          video.removeAttribute('src');
-          video.load();
+          const owned = video.getAttribute('src');
+          if (owned && mediaBySrc.get(owned) === video) {
+            const placeholder = document.createElement('video');
+            copySlotPresentation(video, placeholder);
+            placeholder.hidden = true;
+            placeholder.removeAttribute('src');
+            placeholder.preload = 'none';
+            video.replaceWith(placeholder);
+            park(video);
+            retarget(video, placeholder);
+            bindUserPause(placeholder);
+          } else {
+            video.hidden = true;
+            video.removeAttribute('src');
+            video.load();
+          }
           baseEmpty[key].hidden = false;
           return;
         }
@@ -1378,11 +1582,13 @@
         video.hidden = false;
         if (key === 'ours') video.removeAttribute('poster');
         else video.poster = stillSrc;
-        const freshOurs = key === 'ours' ? freshReplay[scene[0]] : null;
-        clips.push({ video, src: freshOurs ? freshOurs + 'third_person.mp4' : `${baseRoot}${scene[0]}/${file}` });
+        const freshOurs = key === 'ours' ? freshClip(scene[0], 'third') : '';
+        clips.push({ video: baseVideos[key], src: freshOurs || `${baseRoot}${scene[0]}/${file}` });
       });
       baseCaption.textContent = scene[2];
-      return playSynced('base', clips);
+      const job = playSynced('base', clips);
+      baseRun = Promise.resolve(job).then(() => {}, () => {});
+      return job;
     }
     baselineScenes.forEach((scene, index) => {
       const tab = document.createElement('button');
@@ -1390,17 +1596,63 @@
       tab.className = 'scene-tab';
       tab.setAttribute('role', 'tab');
       tab.textContent = scene[1];
-      tab.addEventListener('click', () => { startupEpoch += 1; selectBaseline(index); });
+      tab.addEventListener('click', () => { baselineUserPick = true; selectBaseline(index); });
       baseSwitch.appendChild(tab);
     });
+    // Scene-tab order matches the reconstructed scenes: Block, Pot, Donut,
+    // Fork, Red pen 1, Red pen 2, Black pen. Each contributes its replay
+    // third-person, replay wrist, then the comparison WorldMirror clip.
+    const freshSceneOrder = [
+      'rail-152727',
+      'real-112523',
+      'rail-105805',
+      'rad-180233',
+      'iris-101439',
+      'iris-153900',
+      'iliad-161943'
+    ];
+    async function preloadFreshScenes() {
+      for (const id of freshSceneOrder) {
+        if (!freshReplay[id]) continue;
+        for (const view of ['third', 'wrist', 'third']) {
+          const src = freshClip(id, view);
+          while (activePlaybacks > 0) await sleep(40);
+          const controller = new AbortController();
+          prefetchAbort = controller;
+          await prefetchOne(src, controller.signal);
+          if (prefetchAbort === controller) prefetchAbort = null;
+        }
+      }
+    }
+    async function drainVideos() {
+      const seen = new Set();
+      const pass = async () => {
+        const jobs = [];
+        mediaBySrc.forEach(video => {
+          if (seen.has(video)) return;
+          seen.add(video);
+          jobs.push(waitUntilBuffered(video));
+        });
+        await Promise.all(jobs);
+      };
+      while (activePlaybacks > 0) await sleep(40);
+      await pass();
+      while (activePlaybacks > 0) await sleep(40);
+      await pass();
+      mediaBySrc.forEach(video => { if (!inShot(video)) video.pause(); });
+    }
     const splatStatusEl = document.getElementById('splatStatus');
+    const runStep = async (fn) => { try { await fn(); } catch (error) { console.error(error); } };
     window.visibleVideosReady = (async () => {
       if (splatStatusEl) splatStatusEl.textContent = 'Loading videos…';
       await new Promise(resolve => window.whenHeroReady(resolve));
-      const epoch = startupEpoch;
-      await selectScene(0);
-      if (epoch !== startupEpoch) return;
-      await selectBaseline(0);
+      if (!replayUserPick) await runStep(() => selectScene(0));
+      await runStep(() => replayRun);
+      if (!baselineUserPick) await runStep(() => selectBaseline(0));
+      await runStep(() => baseRun);
+      await runStep(() => replayRun);
+      await runStep(() => preloadFreshScenes());
+      await runStep(() => drainVideos());
     })();
 
     const navTarget = { story: 'story', abstract: 'abstract', method: 'method', scope: 'method', replay: 'replay', scene3d: 'replay', baselines: 'replay', qualitative: 'qualitative', citation: 'citation' };
