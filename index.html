@@ -97,7 +97,7 @@
     .abstract-body p + p { margin-top: 16px; }
     .subsection-head { margin-top: 64px; }
     .case-figure { margin-top: 64px; }
-    .case-figure .art-frame { max-width: 760px; margin-inline: auto; }
+    .case-figure .art-frame { max-width: 560px; margin-inline: auto; }
     .case-figure .art-frame img { cursor: zoom-in; }
     .qual-figures { margin-top: 76px; }
     .qual-figures .gallery-layout { margin-top: 28px; }
@@ -721,6 +721,12 @@
             </div>
           </figure>
         </div>
+        <div class="case-figure reveal">
+          <p class="table-lead">Without verification feedback, the object stays where it started. Full WorldMirror diagnoses the failure and refines until the object reaches the target placement.</p>
+          <figure class="paper-table-block">
+            <div class="art-frame"><img class="zoomable" src="failure_case_diagnosis.png" width="1135" height="1312" alt="Failure diagnosis on a rail task. Without verification feedback the object stays still. Full WorldMirror diagnoses the failure and the object reaches the target." loading="lazy" decoding="async" /></div>
+          </figure>
+        </div>
         <div class="placed-table reveal" id="refinement">
           <p class="table-lead">Effect of verification-driven adaptive refinement on replay performance. One-pass performs reconstruction followed by a single replay attempt. Fixed Iterative repeatedly applies refinement without failure-aware diagnosis. Full WorldMirror performs structured failure diagnosis and targeted refinement.</p>
           <figure class="paper-table-block">
@@ -832,12 +838,6 @@
                 </tbody>
               </table>
             </div>
-          </figure>
-        </div>
-        <div class="case-figure reveal">
-          <p class="table-lead">Without verification feedback, the object stays where it started. Full WorldMirror diagnoses the failure and refines until the object reaches the target placement.</p>
-          <figure class="paper-table-block">
-            <div class="art-frame"><img class="zoomable" src="failure_case_diagnosis.png" width="1135" height="1312" alt="Failure diagnosis on a rail task. Without verification feedback the object stays still. Full WorldMirror diagnoses the failure and the object reaches the target." loading="lazy" decoding="async" /></div>
           </figure>
         </div>
         <div class="qual-figures"><div class="reveal"><h2 class="section-title">The mirror should hold up <em>frame by frame.</em></h2></div><div class="gallery-layout"><div class="gallery-tabs reveal"><button class="gallery-tab is-active" data-image="4scene_methods.png" data-alt="Four scene comparisons across GT, RoboSnap, RoLA, GPT-6 Astra, and WorldMirror" data-tall="false"><strong>Scene fidelity</strong><span>Real appearance, layout, and object placement.</span></button><button class="gallery-tab" data-image="wrist_timeline.png" data-alt="Wrist-view timeline comparison for rigid, separable, and articulated objects" data-tall="true"><strong>Trajectory replay</strong><span>Correspondence over time, from first frame to completion.</span></button></div><div class="gallery-display reveal"><div class="art-frame"><img id="galleryImage" class="zoomable" src="4scene_methods.png" alt="Four scene comparisons across GT, RoboSnap, RoLA, GPT-6 Astra, and WorldMirror" loading="lazy" decoding="async" /></div></div></div></div>
