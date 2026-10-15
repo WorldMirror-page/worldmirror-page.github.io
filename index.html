@@ -994,7 +994,14 @@
       let loaded = index;
       try {
         const gate = window.visibleVideosReady;
-        if (gate && typeof gate.then === "function") await gate;
+        if (gate && typeof gate.then === "function") {
+          try { await gate; }
+          catch (error) {
+            queued = null;
+            status.textContent = window.freshVideoError || "The scene videos did not load, so the 3D scene was not started.";
+            return;
+          }
+        }
         if (queued !== null) {
           loaded = queued;
           queued = null;
@@ -1066,7 +1073,9 @@
     const initialScene = Math.max(0, splatScenes.findIndex((scene) => scene[0].toLowerCase() === requestedScene || scene[2] === requestedScene));
     const startInitialScene = () => { if (!splatArmed) showSplatScene(initialScene); };
     const videosFirst = window.visibleVideosReady;
-    if (videosFirst && typeof videosFirst.then === "function") videosFirst.then(startInitialScene, startInitialScene);
+    if (videosFirst && typeof videosFirst.then === "function") videosFirst.then(startInitialScene, () => {
+      status.textContent = window.freshVideoError || "The scene videos did not load, so the 3D scene was not started.";
+    });
     else window.whenHeroReady(startInitialScene);
     }
   </script>
@@ -1197,6 +1206,28 @@
       const folder = freshReplay[id];
       if (!folder) return '';
       return folder + (view === 'wrist' ? 'wrist.mp4' : 'third_person.mp4');
+    }
+    const freshUrl = new Map();
+    const pendingFresh = new Map();
+    function resolvePlayable(src) {
+      if (!src) return Promise.resolve('');
+      if (freshUrl.has(src)) return Promise.resolve(freshUrl.get(src));
+      const job = pendingFresh.get(src);
+      if (job) return job.then(result => (result && result.url) || src);
+      return Promise.resolve(src);
+    }
+    function placeClip(video, src, origin) {
+      if (!video || !src) return;
+      if (origin) video.dataset.origin = origin;
+      video.preload = 'auto';
+      video.controls = true;
+      video.muted = true;
+      video.defaultMuted = true;
+      video.playsInline = true;
+      video.loop = true;
+      video.autoplay = true;
+      video.hidden = false;
+      if (video.getAttribute('src') !== src) video.src = src;
     }
     const scenes = [
       ['Can', 'Kitchen sink, with a can at the faucet.', 'rpl-164606/original.mp4', 'rpl-164606/original_wrist.mp4', 'rpl-164606/replay_cam_recon.mp4', 'rpl-164606/replay_cam_wrist.mp4'],
@@ -1434,6 +1465,7 @@
       }
       try {
         const alive = () => generation === syncToken[group] && !run.signal.aborted;
+        const mounted = [];
         for (let i = 0; i < list.length; i++) {
           if (!alive()) return;
           const clip = list[i];
@@ -1451,19 +1483,19 @@
             video.fetchPriority = 'high';
             video.setAttribute('fetchpriority', 'high');
           }
-          const ready = video.getAttribute('src') === clip.src && video.readyState >= 3 && !video.error;
-          if (!ready) {
-            video.pause();
-            video.preload = 'auto';
-            if (video.getAttribute('src') !== clip.src) video.src = clip.src;
-            const reason = await waitUntilPlayable(video, run.signal);
-            if (!alive() || reason === 'aborted') return;
-            video.pause();
-          }
+          video.preload = 'auto';
+          if (clip.origin) video.dataset.origin = clip.origin;
+          if (video.getAttribute('src') !== clip.src) video.src = clip.src;
+          mounted.push(video);
+        }
+        for (const video of mounted) {
+          if (!alive()) return;
+          if (video.readyState >= 3 && !video.error) continue;
+          const reason = await waitUntilPlayable(video, run.signal);
+          if (!alive() || reason === 'aborted') return;
         }
         if (!alive()) return;
-        list.forEach(clip => {
-          const video = clip.video;
+        mounted.forEach(video => {
           if (!video || video.error || video.hidden || !video.getAttribute('src')) return;
           if (video.dataset.userPaused === '1') {
             video.dataset.syncLive = '1';
@@ -1478,7 +1510,7 @@
         activePlaybacks -= 1;
       }
     }
-    function selectScene(index) {
+    async function selectScene(index) {
       const scene = scenes[index];
       sceneSwitch.querySelectorAll('.scene-tab').forEach((tab, i) => {
         const on = i === index;
@@ -1486,15 +1518,19 @@
         tab.setAttribute('aria-selected', on ? 'true' : 'false');
       });
       sceneCaption.textContent = scene[1];
-      const job = playSynced('replay', ['realExt', 'realWrist', 'simExt', 'simWrist'].map((key, i) => {
+      const specs = ['realExt', 'realWrist', 'simExt', 'simWrist'].map((key, i) => {
         const rel = scene[i + 2];
         const id = rel.split('/')[0];
         const fresh = i >= 2 ? freshClip(id, i === 2 ? 'third' : 'wrist') : '';
-        return {
-          video: demoVideos[key],
-          src: fresh || (demoRoot + rel)
-        };
-      }));
+        return { video: demoVideos[key], fresh, fallback: demoRoot + rel };
+      });
+      const resolved = await Promise.all(specs.map(spec => spec.fresh ? resolvePlayable(spec.fresh) : Promise.resolve(spec.fallback)));
+      const clips = specs.map((spec, i) => {
+        const src = resolved[i];
+        placeClip(spec.video, src, spec.fresh || spec.fallback);
+        return { video: spec.video, src, origin: spec.fresh || spec.fallback };
+      });
+      const job = playSynced('replay', clips);
       replayRun = Promise.resolve(job).then(() => {}, () => {});
       return job;
     }
@@ -1539,7 +1575,7 @@
       baseEmpty[key] = document.querySelector(`[data-empty="${key}"]`);
       bindUserPause(baseVideos[key]);
     });
-    function selectBaseline(index) {
+    async function selectBaseline(index) {
       if (groupAbort.base) groupAbort.base.abort();
       syncToken.base += 1;
       const scene = baselineScenes[index];
@@ -1583,10 +1619,16 @@
         if (key === 'ours') video.removeAttribute('poster');
         else video.poster = stillSrc;
         const freshOurs = key === 'ours' ? freshClip(scene[0], 'third') : '';
-        clips.push({ video: baseVideos[key], src: freshOurs || `${baseRoot}${scene[0]}/${file}` });
+        clips.push({ video, fresh: freshOurs, fallback: freshOurs || `${baseRoot}${scene[0]}/${file}` });
+      });
+      const resolved = await Promise.all(clips.map(clip => clip.fresh ? resolvePlayable(clip.fresh) : Promise.resolve(clip.fallback)));
+      const readyClips = clips.map((clip, i) => {
+        const src = resolved[i];
+        placeClip(clip.video, src, clip.fresh || clip.fallback);
+        return { video: clip.video, src, origin: clip.fresh || clip.fallback };
       });
       baseCaption.textContent = scene[2];
-      const job = playSynced('base', clips);
+      const job = playSynced('base', readyClips);
       baseRun = Promise.resolve(job).then(() => {}, () => {});
       return job;
     }
@@ -1600,8 +1642,8 @@
       baseSwitch.appendChild(tab);
     });
     // Scene-tab order matches the reconstructed scenes: Block, Pot, Donut,
-    // Fork, Red pen 1, Red pen 2, Black pen. Each contributes its replay
-    // third-person, replay wrist, then the comparison WorldMirror clip.
+    // Fork, Red pen 1, Red pen 2, Black pen. Replay uses third_person plus
+    // wrist. Compare uses the same third_person file, fetched once.
     const freshSceneOrder = [
       'rail-152727',
       'real-112523',
@@ -1611,18 +1653,61 @@
       'iris-153900',
       'iliad-161943'
     ];
-    async function preloadFreshScenes() {
+    function loadFreshFile(src) {
+      const state = { src, last: performance.now() };
+      state.promise = fetch(src).then(async response => {
+        if (!response.ok) return { src, status: response.status };
+        const chunks = [];
+        if (response.body && response.body.getReader) {
+          const reader = response.body.getReader();
+          while (true) {
+            const step = await reader.read();
+            if (step.done) break;
+            if (step.value && step.value.byteLength) {
+              chunks.push(step.value);
+              state.last = performance.now();
+            }
+          }
+        } else {
+          chunks.push(new Uint8Array(await response.arrayBuffer()));
+        }
+        const url = URL.createObjectURL(new Blob(chunks, { type: 'video/mp4' }));
+        freshUrl.set(src, url);
+        return { src, url, status: response.status };
+      }).catch(() => ({ src, status: 0 }));
+      return state;
+    }
+    async function primeFreshScenes() {
+      const srcs = [];
+      const seen = new Set();
       for (const id of freshSceneOrder) {
-        if (!freshReplay[id]) continue;
-        for (const view of ['third', 'wrist', 'third']) {
+        for (const view of ['third', 'wrist']) {
           const src = freshClip(id, view);
-          while (activePlaybacks > 0) await sleep(40);
-          const controller = new AbortController();
-          prefetchAbort = controller;
-          await prefetchOne(src, controller.signal);
-          if (prefetchAbort === controller) prefetchAbort = null;
+          if (!src || seen.has(src)) continue;
+          seen.add(src);
+          srcs.push(src);
         }
       }
+      const states = srcs.map(src => {
+        const state = loadFreshFile(src);
+        pendingFresh.set(src, state.promise);
+        return state;
+      });
+      const missing = [];
+      await Promise.all(states.map(async state => {
+        while (true) {
+          const status = await Promise.race([
+            state.promise.then(result => ({ done: true, result })),
+            sleep(250).then(() => ({ done: false }))
+          ]);
+          if (status.done) {
+            if (!status.result.url) missing.push(state.src + ' (' + (status.result.status || 'failed') + ')');
+            return;
+          }
+          if (performance.now() - state.last >= 8000) return;
+        }
+      }));
+      return missing;
     }
     async function drainVideos() {
       const seen = new Set();
@@ -1643,15 +1728,21 @@
     }
     const splatStatusEl = document.getElementById('splatStatus');
     const runStep = async (fn) => { try { await fn(); } catch (error) { console.error(error); } };
+    window.freshVideoError = '';
     window.visibleVideosReady = (async () => {
       if (splatStatusEl) splatStatusEl.textContent = 'Loading videos…';
       await new Promise(resolve => window.whenHeroReady(resolve));
+      const missing = await primeFreshScenes();
+      if (missing.length) {
+        window.freshVideoError = 'Missing video: ' + missing.join(', ');
+        if (splatStatusEl) splatStatusEl.textContent = window.freshVideoError;
+        throw new Error(window.freshVideoError);
+      }
       if (!replayUserPick) await runStep(() => selectScene(0));
       await runStep(() => replayRun);
       if (!baselineUserPick) await runStep(() => selectBaseline(0));
       await runStep(() => baseRun);
       await runStep(() => replayRun);
-      await runStep(() => preloadFreshScenes());
       await runStep(() => drainVideos());
     })();
 
