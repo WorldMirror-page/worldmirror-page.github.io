@@ -320,9 +320,13 @@
     .method-card img { cursor: zoom-in; }
     .clip-missing { display: grid; place-items: center; color: #71859c; font-size: 12px; font-weight: 750; letter-spacing: .04em; text-align: center; padding: 8px; }
     .clip-missing[hidden], .method-card video[hidden] { display: none; }
-    .splat-stage { position: relative; height: min(78vh, 820px); margin-top: 28px; border-radius: 22px; overflow: hidden; background: #dfe8e4; border: 1px solid rgba(23,52,90,.12); }
+    .splat-stage { position: relative; width: 100%; aspect-ratio: 16 / 9; height: auto; margin-top: 18px; border-radius: 22px; overflow: hidden; background: #dfe8e4; border: 1px solid rgba(23,52,90,.12); }
     .splat-stage canvas { display: block; }
     .splat-status { position: absolute; left: 16px; bottom: 14px; z-index: 2; margin: 0; padding: 8px 12px; border-radius: 999px; background: rgba(251,250,246,.88); color: #17345a; font-size: 12px; font-weight: 750; pointer-events: none; }
+    .splat-ref { position: absolute; top: 14px; left: 14px; z-index: 3; width: min(228px, 32%); margin: 0; padding: 7px 7px 8px; border-radius: 16px; background: rgba(251,250,246,.94); box-shadow: 0 12px 30px rgba(23,52,90,.16); pointer-events: none; }
+    .splat-ref img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 10px; background: #e7eeea; }
+    .splat-ref figcaption { display: flex; justify-content: space-between; gap: 8px; margin: 7px 4px 0; color: #17345a; font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    .splat-ref figcaption span:last-child { color: #71859c; font-weight: 700; letter-spacing: .06em; }
     @media (max-width: 640px) {
       .compare { gap: 10px; }
       .compare-col { padding: 8px; border-radius: 14px; }
@@ -517,8 +521,13 @@
 
     <section class="section" id="scene3d">
       <div class="section-inner">
-        <div class="reveal"><div class="section-kicker">Scene</div><h2 class="section-title">Turn the reconstructed <em>world.</em></h2><p class="demo-lead">The room is the reconstructed scene. The fork, cutlery holder, and arm are the solid models from the same file. Drag to orbit the full circle, and scroll to move closer.</p></div>
-        <div class="splat-stage" id="splatStage"><p class="splat-status" id="splatStatus">Loading the scene…</p></div>
+        <div class="reveal"><div class="section-kicker">Scene</div><h2 class="section-title">Turn the reconstructed <em>world.</em></h2><p class="demo-lead">Seven DROID scenes, reconstructed the same way. The photo stays in the corner so the real first frame can be compared with the orbit. Drag to turn the full circle, and scroll to move closer.</p></div>
+        <div class="scene-switch" id="splatSwitch" role="tablist" aria-label="Reconstructed scenes"></div>
+        <div class="splat-stage" id="splatStage">
+          <figure class="splat-ref" id="splatRef"><img id="splatRefImg" alt="Real first frame of the selected scene"><figcaption><span>Real</span><span>First frame</span></figcaption></figure>
+          <p class="splat-status" id="splatStatus">Loading the scene…</p>
+        </div>
+        <div class="demo-foot"><p class="scene-caption" id="splatCaption"></p></div>
       </div>
     </section>
 
@@ -751,29 +760,33 @@
   <script type="module">
     import * as THREE from "three";
     import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/loaders/GLTFLoader.js";
+    import { RoomEnvironment } from "https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/environments/RoomEnvironment.js";
     import * as GaussianSplats3D from "./scene/gaussian-splats-3d.module.js";
     const stage = document.getElementById("splatStage");
     const status = document.getElementById("splatStatus");
+    const splatSwitch = document.getElementById("splatSwitch");
+    const splatCaption = document.getElementById("splatCaption");
+    const splatRefImg = document.getElementById("splatRefImg");
+    if (new URLSearchParams(location.search).has("debugScene")) {
+      document.getElementById("splatRef")?.style.setProperty("display", "none");
+    }
     if (location.protocol === "file:") {
       status.textContent = "Open this page through a local server. A file:// address cannot load the 3D scene.";
     } else {
-    const lookAt = [0.12, 1.02, 0.05];
-    const eye = [2.15, 1.72, 2.25];
-    const requestedScene = new URLSearchParams(location.search).get('scene');
-    const sceneFiles = {
-      faithful: 'scene/room-faithful.ply',
-      room2: 'scene/room2.ply',
-      room3: 'scene/room3.ply',
-      room4: 'scene/room4.ply',
-      room5: 'scene/room5.ply',
-      room6: 'scene/room6.ply'
-    };
-    const splatPath = sceneFiles[requestedScene] || sceneFiles.faithful;
+    const splatScenes = [
+      ["Block", "Colored blocks on a wooden table.", "rail-152727-ext1-rodin", [-0.2207, 0.3606, -0.4547], [-0.2334, 0.9986, 0.3153], [0.006, 0.7701, -0.6379], 68.82, 631.914, 360.276],
+      ["Pot", "Round table with a lidded pot, towel, and cups.", "real-112523-ext1-rodin", [0.0065, 0.7048, -0.7663], [0.0708, 1.1823, 0.1099], [0.0439, 0.8759, -0.4805], 68.32, 646.088, 368.571],
+      ["Donut", "Tabletop with a plate and small objects.", "rail-105805-ext1-rodin", [1.4244, -0.2639, -0.6078], [1.5464, 1.0462, 0.9537], [-0.0547, 0.767, -0.6393], 68.74, 631.915, 360.276],
+      ["Fork", "White table with a bottle, plate, and tray.", "rad-180233-ext1-rodin", [-0.2282, 0.5917, -0.8836], [-0.2734, 1.364, 0.9098], [-0.038, 0.9174, -0.396], 69.22, 649.276, 357.111],
+      ["Red pen 1", "Round table with a bowl and a marker.", "iris-101439-ext1-rodin", [-0.0067, 0.0066, -1.3693], [-0.0624, 1.1628, -0.051], [-0.0389, 0.7504, -0.6598], 69.15, 640.491, 353.232],
+      ["Red pen 2", "Round table with a blue cup and a marker.", "iris-153900-ext2", [-1.9153, -0.9669, -0.3007], [-1.969, 1.303, 1.8216], [0.0374, 0.683, -0.7295], 69.10, 639.236, 352.502],
+      ["Black pen", "Wooden table with a black cup and calibration boards.", "iliad-161943-ext2-rodin", [0.1628, 0.2043, -1.3399], [0.2903, 1.2713, -0.1885], [-0.1228, 0.7346, -0.6672], 68.20, 656.275, 360.359]
+    ];
     const viewer = new GaussianSplats3D.Viewer({
       rootElement: stage,
       cameraUp: [0, 1, 0],
-      initialCameraPosition: eye,
-      initialCameraLookAt: lookAt,
+      initialCameraPosition: [2.2, 1.7, 2.2],
+      initialCameraLookAt: [0, 0.8, 0],
       sphericalHarmonicsDegree: 0,
       sharedMemoryForWorkers: false,
       gpuAcceleratedSort: false,
@@ -795,13 +808,23 @@
       controls.enableZoom = true;
       controls.enableDamping = true;
     };
-    const frameScene = () => {
+    const frameScene = (scene) => {
+      const lookAt = scene[3];
+      const eye = scene[4];
+      const up = scene[5];
+      const fov = scene[6];
+      const cx = scene[7];
+      const cy = scene[8];
       unlock(viewer.controls);
       unlock(viewer.perspectiveControls);
       unlock(viewer.orthographicControls);
-      if (viewer.camera) {
-        viewer.camera.up.set(0, 1, 0);
-        viewer.camera.position.set(eye[0], eye[1], eye[2]);
+      const cameras = [viewer.camera, viewer.perspectiveCamera].filter((cam, index, list) => cam && list.indexOf(cam) === index);
+      for (const cam of cameras) {
+        cam.up.set(up[0], up[1], up[2]);
+        cam.position.set(eye[0], eye[1], eye[2]);
+        cam.fov = fov;
+        cam.setViewOffset(1280, 720, 640 - cx, 360 - cy, 1280, 720);
+        cam.updateProjectionMatrix();
       }
       const seen = new Set();
       for (const controls of [viewer.controls, viewer.perspectiveControls, viewer.orthographicControls]) {
@@ -811,37 +834,222 @@
         controls.update();
       }
     };
-    frameScene();
-    const hemi = new THREE.HemisphereLight(0xfff8f0, 0x8aa0b8, 1.15);
-    const sun = new THREE.DirectionalLight(0xffffff, 1.6);
-    sun.position.set(2.4, 4.2, 2.2);
-    const fill = new THREE.DirectionalLight(0xdfe7ff, 0.55);
-    fill.position.set(-2.2, 2.4, -1.6);
+    const pmrem = new THREE.PMREMGenerator(viewer.renderer);
+    viewer.threeScene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    pmrem.dispose();
+    viewer.renderer.outputColorSpace = THREE.SRGBColorSpace;
+    viewer.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    viewer.renderer.toneMappingExposure = 1.0;
+    const hemi = new THREE.HemisphereLight(0xf6f8fb, 0xb7c3cc, 0.28);
+    const sun = new THREE.DirectionalLight(0xfffaf4, 0.72);
+    sun.position.set(2.2, 4.6, 3.1);
+    const fill = new THREE.DirectionalLight(0xd7e4f5, 0.18);
+    fill.position.set(-3.2, 2.4, -1.6);
     viewer.threeScene.add(hemi, sun, fill);
-    window.whenHeroReady(() => {
-    const props = new GLTFLoader().loadAsync("scene/props-pbr.glb").then((gltf) => {
-      gltf.scene.traverse((obj) => {
+    const postSplatScene = new THREE.Scene();
+    postSplatScene.environment = viewer.threeScene.environment;
+    postSplatScene.add(hemi.clone(), sun.clone(), fill.clone());
+    const transmissionTarget = new THREE.WebGLRenderTarget(1, 1, {
+      type: THREE.HalfFloatType,
+      minFilter: THREE.LinearMipmapLinearFilter,
+      magFilter: THREE.LinearFilter,
+      generateMipmaps: true,
+      depthBuffer: false,
+      stencilBuffer: false
+    });
+    const transmissionSize = new THREE.Vector2(1, 1);
+    const resizeTransmissionTarget = () => {
+      viewer.renderer.getDrawingBufferSize(transmissionSize);
+      if (transmissionTarget.width !== transmissionSize.x || transmissionTarget.height !== transmissionSize.y) {
+        transmissionTarget.setSize(transmissionSize.x, transmissionSize.y);
+      }
+    };
+    viewer.afterSplatScene = postSplatScene;
+    viewer.afterSplatRenderTarget = transmissionTarget;
+    const loader = new GLTFLoader();
+    let propsRoot = null;
+    let postSplatRoot = null;
+    let splatCount = 0;
+    let started = false;
+    let busy = false;
+    let queued = null;
+    const configureGlass = (material) => {
+      // RTX resolves the authored thin OmniGlass against scene reflections.
+      // A generic WebGL environment turns the same white authored color into
+      // a flat white disk, so use the PreviewSurface-compatible reflective
+      // fallback while retaining the authored IOR and roughness.
+      material.color.setRGB(0.035, 0.045, 0.055);
+      material.metalness = 0.18;
+      material.roughness = 0.06;
+      material.ior = 1.5;
+      material.transmission = 0.18;
+      material.thickness = 0.0;
+      material.opacity = 0.94;
+      material.transparent = true;
+      material.depthTest = true;
+      material.depthWrite = false;
+      material.side = THREE.DoubleSide;
+      material.clearcoat = 0.35;
+      material.clearcoatRoughness = 0.05;
+      material.envMapIntensity = 1.35;
+      material.onBeforeCompile = (shader) => {
+        shader.fragmentShader = shader.fragmentShader
+          .replace("#include <transmission_pars_fragment>", THREE.ShaderChunk.transmission_pars_fragment)
+          .replace("#include <transmission_fragment>", THREE.ShaderChunk.transmission_fragment)
+          .replace(/transmissionSamplerMap/g, "worldMirrorTransmissionMap")
+          .replace(/transmissionSamplerSize/g, "worldMirrorTransmissionSize");
+        shader.uniforms.worldMirrorTransmissionMap = { value: transmissionTarget.texture };
+        shader.uniforms.worldMirrorTransmissionSize = { value: transmissionSize };
+      };
+      material.needsUpdate = true;
+    };
+    const prepareProps = (root) => {
+      const opaqueRoot = new THREE.Group();
+      const postRoot = new THREE.Group();
+      const sharedGeometry = (geometry, start, count) => {
+        const part = new THREE.BufferGeometry();
+        for (const name of Object.keys(geometry.attributes)) {
+          part.setAttribute(name, geometry.getAttribute(name));
+        }
+        if (geometry.index) part.setIndex(geometry.index);
+        part.setDrawRange(start, count);
+        if (geometry.boundingSphere) part.boundingSphere = geometry.boundingSphere.clone();
+        if (geometry.boundingBox) part.boundingBox = geometry.boundingBox.clone();
+        return part;
+      };
+      const isRobotMaterial = (material) => {
+        const label = String(material?.name || "").toLowerCase();
+        return label.includes("/world/franka/") || label.includes("robotiq") || label.includes("panda_link");
+      };
+      root.traverse((obj) => {
         if (!obj.isMesh) return;
         if (!obj.geometry.getAttribute("normal")) obj.geometry.computeVertexNormals();
-        obj.renderOrder = 1;
+        const materials = Array.isArray(obj.material) ? obj.material : [obj.material];
+        const isGlass = (material) => material && (material.userData.sourceShader === "OmniGlass" || material.transmission > 0.01);
+        obj.updateWorldMatrix(true, false);
+        const groups = obj.geometry.groups.length ? obj.geometry.groups : [{ start: 0, count: obj.geometry.index ? obj.geometry.index.count : obj.geometry.getAttribute("position").count, materialIndex: 0 }];
+        groups.forEach((group) => {
+          const sourceMaterial = materials[group.materialIndex] || materials[0];
+          if (!sourceMaterial) return;
+          const robot = isRobotMaterial(sourceMaterial);
+          const authoredDoubleSided = sourceMaterial.side === THREE.DoubleSide;
+          const sourceLabel = String(sourceMaterial.name || "").toLowerCase();
+          const knownThinShell = sourceLabel.includes("blue_cutlery_holder");
+          const material = sourceMaterial.clone();
+          const glass = isGlass(sourceMaterial);
+          if (glass) {
+            configureGlass(material);
+          } else {
+            // The USD exporter carries the authored material opacity and
+            // double-sided flag into glTF. Keep ordinary materials opaque,
+            // while preserving double-sided shells such as the cutlery tray
+            // and the small gripper pads.
+            material.transparent = false;
+            material.opacity = 1;
+            material.alphaTest = 0;
+            material.depthTest = true;
+            material.depthWrite = true;
+            material.blending = THREE.NormalBlending;
+            material.side = robot || authoredDoubleSided || knownThinShell ? THREE.DoubleSide : THREE.FrontSide;
+            if ("forceSinglePass" in material) material.forceSinglePass = true;
+            if (material.map) {
+              material.map.colorSpace = THREE.SRGBColorSpace;
+              material.map.needsUpdate = true;
+            }
+            material.needsUpdate = true;
+          }
+          const mesh = new THREE.Mesh(sharedGeometry(obj.geometry, group.start, group.count), material);
+          mesh.matrix.copy(obj.matrixWorld);
+          mesh.matrixAutoUpdate = false;
+          mesh.frustumCulled = false;
+          // The splat room must be behind the tray shell. Otherwise its
+          // white table splats are composited over the blue interior.
+          (robot || glass || knownThinShell ? postRoot : opaqueRoot).add(mesh);
+        });
       });
-      viewer.threeScene.add(gltf.scene);
-    });
-    Promise.resolve(viewer.addSplatScene(splatPath, {
-      showLoadingUI: false,
-      progressiveLoad: false,
-      splatAlphaRemovalThreshold: 1
-    })).then(() => props).then(() => {
-      frameScene();
-      viewer.start();
+      return { opaqueRoot, postRoot };
+    };
+    const frameLoadedScene = (scene) => {
+      frameScene(scene);
       viewer.splatMesh.frustumCulled = false;
-      requestAnimationFrame(frameScene);
-      status.textContent = "Drag to orbit · scroll to zoom · right-drag to pan";
-    }).catch((error) => {
-      status.textContent = "The scene could not be loaded. " + (error && error.message ? error.message : "");
-      console.error(error);
+    };
+    const showSplatScene = async (index) => {
+      splatSwitch.querySelectorAll(".scene-tab").forEach((tab, i) => {
+        const on = i === index;
+        tab.classList.toggle("is-active", on);
+        tab.setAttribute("aria-selected", on ? "true" : "false");
+      });
+      if (busy) {
+        queued = index;
+        return;
+      }
+      busy = true;
+      const scene = splatScenes[index];
+      splatCaption.textContent = scene[1];
+      splatRefImg.alt = "Real first frame, " + scene[0];
+      splatRefImg.src = "droid_scale20_real_first_frames/" + scene[2] + ".png";
+      status.textContent = "Loading " + scene[0] + "…";
+      try {
+        if (splatCount) {
+          await viewer.removeSplatScene(0, false);
+          splatCount = 0;
+        }
+        if (propsRoot) {
+          viewer.threeScene.remove(propsRoot);
+          propsRoot = null;
+        }
+        if (postSplatRoot) {
+          postSplatScene.remove(postSplatRoot);
+          postSplatRoot = null;
+        }
+        const propsPromise = loader.loadAsync("scene/droid/" + scene[2] + ".glb?v=11");
+        await viewer.addSplatScene("scene/droid/" + scene[2] + ".v8.ply", {
+          showLoadingUI: false,
+          progressiveLoad: false,
+          splatAlphaRemovalThreshold: 1
+        });
+        splatCount = 1;
+        const gltf = await propsPromise;
+        const prepared = prepareProps(gltf.scene);
+        propsRoot = prepared.opaqueRoot;
+        postSplatRoot = prepared.postRoot;
+        viewer.threeScene.add(propsRoot);
+        postSplatScene.add(postSplatRoot);
+        resizeTransmissionTarget();
+        frameLoadedScene(scene);
+        if (!started) {
+          viewer.start();
+          started = true;
+        }
+        requestAnimationFrame(() => frameLoadedScene(scene));
+        status.textContent = "Drag to orbit · scroll to zoom · right-drag to pan";
+      } catch (error) {
+        status.textContent = "The scene could not be loaded. " + (error && error.message ? error.message : "");
+        console.error(error);
+      } finally {
+        busy = false;
+        if (queued !== null && queued !== index) {
+          const next = queued;
+          queued = null;
+          showSplatScene(next);
+        } else {
+          queued = null;
+        }
+      }
+    };
+    splatScenes.forEach((scene, index) => {
+      const tab = document.createElement("button");
+      tab.type = "button";
+      tab.className = "scene-tab";
+      tab.setAttribute("role", "tab");
+      tab.setAttribute("aria-selected", "false");
+      tab.textContent = scene[0];
+      tab.addEventListener("click", () => showSplatScene(index));
+      splatSwitch.appendChild(tab);
     });
-    });
+    const requestedScene = new URLSearchParams(location.search).get("scene");
+    const initialScene = Math.max(0, splatScenes.findIndex((scene) => scene[0].toLowerCase() === requestedScene || scene[2] === requestedScene));
+    window.whenHeroReady(() => showSplatScene(initialScene));
     }
   </script>
   <script>
@@ -958,16 +1166,25 @@
     document.addEventListener('keydown', e => { if (e.key === 'Escape') lightbox.classList.remove('open'); });
 
     const demoRoot = 'videos/feishu-blog-demo/Droid demo/';
+    const freshReplay = {
+      'rail-152727': '_invert_brightness_success_1080p_views/rail-152727-ext1-rodin/',
+      'real-112523': '_invert_brightness_success_1080p_views/real-112523-ext1-rodin/',
+      'rail-105805': '_invert_brightness_success_1080p_views/rail-105805-ext1-rodin/',
+      'rad-180233': '_invert_brightness_success_1080p_views/rad-180233-ext1-rodin/',
+      'iris-101439': '_invert_brightness_success_1080p_views/iris-101439-ext1-rodin/',
+      'iris-153900': '_invert_brightness_success_1080p_views/iris-153900-ext2/',
+      'iliad-161943': '_invert_brightness_success_1080p_views/iliad-161943-ext2-rodin/'
+    };
     const scenes = [
-      ['Sink', 'Kitchen sink, with a can at the faucet.', 'rpl-164606/original.mp4', 'rpl-164606/original_wrist.mp4', 'rpl-164606/replay_cam_recon.mp4', 'rpl-164606/replay_cam_wrist.mp4'],
-      ['Blocks', 'Colored blocks on a wooden table.', 'rail-152727/original.mp4', 'rail-152727/original_wrist.mp4', 'rail-152727/replay_cam_recon.mp4', 'rail-152727/replay_cam_wrist.mp4'],
+      ['Can', 'Kitchen sink, with a can at the faucet.', 'rpl-164606/original.mp4', 'rpl-164606/original_wrist.mp4', 'rpl-164606/replay_cam_recon.mp4', 'rpl-164606/replay_cam_wrist.mp4'],
+      ['Block', 'Colored blocks on a wooden table.', 'rail-152727/original.mp4', 'rail-152727/original_wrist.mp4', 'rail-152727/replay_cam_recon.mp4', 'rail-152727/replay_cam_wrist.mp4'],
       ['Pot', 'Round table with a lidded pot, towel, and cups.', 'real-112523/20540549.mp4', 'real-112523/11744905.mp4', 'real-112523/replay_cam_recon.mp4', 'real-112523/replay_cam_wrist.mp4'],
-      ['Workbench', 'Workbench with a bowl and an orange cup.', 'autolab-084400/22008760.mp4', 'autolab-084400/18026681.mp4', 'autolab-084400/episode_0000000_cam_recon.mp4', 'autolab-084400/episode_0000000_cam_wrist.mp4'],
-      ['Plate', 'Tabletop with a plate and small objects.', 'rail-105805/original.mp4', 'rail-105805/original_wrist.mp4', 'rail-105805/replay_cam_recon.mp4', 'rail-105805/replay_cam_wrist.mp4'],
-      ['Bottle', 'White table with a bottle, plate, and tray.', 'rad-180233/original.mp4', 'rad-180233/original_wrist.mp4', 'rad-180233/replay_cam_recon.mp4', 'rad-180233/replay_cam_wrist.mp4'],
-      ['Bowl', 'Round table with a bowl and a marker.', 'iris-101439/original.mp4', 'iris-101439/original_wrist.mp4', 'iris-101439/replay_cam_recon.mp4', 'iris-101439/replay_cam_wrist.mp4'],
-      ['Blue cup', 'Round table with a blue cup and a marker.', 'iris-153900/original.mp4', 'iris-153900/original_wrist.mp4', 'iris-153900/replay_cam_recon.mp4', 'iris-153900/replay_cam_wrist.mp4'],
-      ['Cup', 'Wooden table with a black cup and calibration boards.', 'iliad-161943/original.mp4', 'iliad-161943/original_wrist.mp4', 'iliad-161943/replay_cam_recon.mp4', 'iliad-161943/replay_cam_wrist.mp4'],
+      ['Orange cup', 'Workbench with a bowl and an orange cup.', 'autolab-084400/22008760.mp4', 'autolab-084400/18026681.mp4', 'autolab-084400/episode_0000000_cam_recon.mp4', 'autolab-084400/episode_0000000_cam_wrist.mp4'],
+      ['Donut', 'Tabletop with a plate and small objects.', 'rail-105805/original.mp4', 'rail-105805/original_wrist.mp4', 'rail-105805/replay_cam_recon.mp4', 'rail-105805/replay_cam_wrist.mp4'],
+      ['Fork', 'White table with a bottle, plate, and tray.', 'rad-180233/original.mp4', 'rad-180233/original_wrist.mp4', 'rad-180233/replay_cam_recon.mp4', 'rad-180233/replay_cam_wrist.mp4'],
+      ['Red pen 1', 'Round table with a bowl and a marker.', 'iris-101439/original.mp4', 'iris-101439/original_wrist.mp4', 'iris-101439/replay_cam_recon.mp4', 'iris-101439/replay_cam_wrist.mp4'],
+      ['Red pen 2', 'Round table with a blue cup and a marker.', 'iris-153900/original.mp4', 'iris-153900/original_wrist.mp4', 'iris-153900/replay_cam_recon.mp4', 'iris-153900/replay_cam_wrist.mp4'],
+      ['Black pen', 'Wooden table with a black cup and calibration boards.', 'iliad-161943/original.mp4', 'iliad-161943/original_wrist.mp4', 'iliad-161943/replay_cam_recon.mp4', 'iliad-161943/replay_cam_wrist.mp4'],
       ['Cabinet', 'Cabinet and sink workspace.', 'guptalab-153414/original.mp4', 'guptalab-153414/original_wrist.mp4', 'guptalab-153414/replay_cam_recon.mp4', 'guptalab-153414/replay_cam_wrist.mp4']
     ];
     const sceneSwitch = document.getElementById('sceneSwitch');
@@ -1052,10 +1269,15 @@
         tab.setAttribute('aria-selected', on ? 'true' : 'false');
       });
       sceneCaption.textContent = scene[1];
-      playSynced('replay', ['realExt', 'realWrist', 'simExt', 'simWrist'].map((key, i) => ({
-        video: demoVideos[key],
-        src: demoRoot + scene[i + 2]
-      })));
+      playSynced('replay', ['realExt', 'realWrist', 'simExt', 'simWrist'].map((key, i) => {
+        const rel = scene[i + 2];
+        const id = rel.split('/')[0];
+        const fresh = i >= 2 ? freshReplay[id] : null;
+        return {
+          video: demoVideos[key],
+          src: fresh ? fresh + (i === 2 ? 'third_person.mp4' : 'wrist.mp4') : demoRoot + rel
+        };
+      }));
     }
     scenes.forEach((scene, index) => {
       const tab = document.createElement('button');
@@ -1070,16 +1292,16 @@
 
     const baseRoot = 'baseline_source_stills/';
     const baselineScenes = [
-      ['rpl-164606', 'Sink', 'Kitchen sink, with a can on the counter.', true],
-      ['rail-152727', 'Blocks', 'Colored blocks on a wooden table.', true],
+      ['rpl-164606', 'Can', 'Kitchen sink, with a can on the counter.', true],
+      ['rail-152727', 'Block', 'Colored blocks on a wooden table.', true],
       ['real-112523', 'Pot', 'Round table with a lidded pot, towel, and cups.', true],
-      ['rail-105805', 'Plate', 'Tabletop with a plate and small objects.', false],
-      ['rad-180233', 'Bottle', 'White table with a bottle, plate, and tray.', true],
-      ['iris-101439', 'Bowl', 'Round table with a bowl and a marker.', true],
-      ['iris-153900', 'Blue cup', 'Round table with a blue cup and a marker.', true],
-      ['iliad-161943', 'Cup', 'Wooden table with a black cup and calibration boards.', true],
+      ['rail-105805', 'Donut', 'Tabletop with a plate and small objects.', true],
+      ['rad-180233', 'Fork', 'White table with a bottle, plate, and tray.', true],
+      ['iris-101439', 'Red pen 1', 'Round table with a bowl and a marker.', true],
+      ['iris-153900', 'Red pen 2', 'Round table with a blue cup and a marker.', true],
+      ['iliad-161943', 'Black pen', 'Wooden table with a black cup and calibration boards.', true],
       ['guptalab-153414', 'Cabinet', 'Cabinet and sink workspace.', true],
-      ['rad-155000', 'Tray', 'Cutlery tray on a white table.', false]
+      ['rad-155000', 'Spoon', 'Cutlery tray on a white table.', false]
     ];
     const baseMethods = {
       gt: 'videos/gt.mp4',
@@ -1132,7 +1354,8 @@
         video.hidden = false;
         if (key === 'ours') video.removeAttribute('poster');
         else video.poster = stillSrc;
-        clips.push({ video, src: `${baseRoot}${scene[0]}/${file}` });
+        const freshOurs = key === 'ours' ? freshReplay[scene[0]] : null;
+        clips.push({ video, src: freshOurs ? freshOurs + 'third_person.mp4' : `${baseRoot}${scene[0]}/${file}` });
       });
       baseCaption.textContent = scene[2];
       playSynced('base', clips);

@@ -13817,14 +13817,37 @@ class Viewer {
             };
 
             const savedAuoClear = this.renderer.autoClear;
-            if (hasRenderables(this.threeScene)) {
-                this.renderer.render(this.threeScene, this.camera);
+            const renderBase = (target) => {
+                this.renderer.setRenderTarget(target);
+                if (target) this.renderer.clear();
+                if (hasRenderables(this.threeScene)) {
+                    this.renderer.render(this.threeScene, this.camera);
+                    this.renderer.autoClear = false;
+                }
+                this.renderer.render(this.splatMesh, this.camera);
                 this.renderer.autoClear = false;
+                if (this.sceneHelper.getFocusMarkerOpacity() > 0.0) this.renderer.render(this.sceneHelper.focusMarker, this.camera);
+                if (this.showControlPlane) this.renderer.render(this.sceneHelper.controlPlane, this.camera);
+            };
+
+            // A transmissive mesh in threeScene is rendered before the
+            // Gaussian pass, so the splats overwrite it.  When the host
+            // supplies these two optional objects, render an identical base
+            // frame first for the transmission sampler, then draw the solid
+            // asset scene after the splats. Clear only depth before this
+            // overlay: otherwise Gaussian depth values can occlude robot
+            // links and gripper pads from particular orbit angles.
+            if (this.afterSplatRenderTarget && this.afterSplatScene) {
+                renderBase(this.afterSplatRenderTarget);
+                this.renderer.autoClear = savedAuoClear;
+                renderBase(null);
+                this.renderer.autoClear = false;
+                this.renderer.clearDepth();
+                this.renderer.render(this.afterSplatScene, this.camera);
+            } else {
+                renderBase(null);
             }
-            this.renderer.render(this.splatMesh, this.camera);
-            this.renderer.autoClear = false;
-            if (this.sceneHelper.getFocusMarkerOpacity() > 0.0) this.renderer.render(this.sceneHelper.focusMarker, this.camera);
-            if (this.showControlPlane) this.renderer.render(this.sceneHelper.controlPlane, this.camera);
+            this.renderer.setRenderTarget(null);
             this.renderer.autoClear = savedAuoClear;
         };
 
