@@ -41,7 +41,9 @@
     .nav-links { display:flex; gap: 24px; align-items:center; color: #c3cadd; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
     .nav-links a { opacity: .75; transition: color .2s, opacity .2s; }
     .nav-links a:hover, .nav-links a.active { color: var(--cyan-2); opacity: 1; }
-    .nav-action { border: 1px solid rgba(181,255,241,.45); color: var(--cyan-2); border-radius: 999px; padding: 8px 13px; font-size: 11px; letter-spacing: .08em; background: rgba(113,225,208,.08); }
+    .nav-action { border: 0; color: #9aa8bf; border-radius: 0; padding: 5px 0; font-size: 10px; letter-spacing: .12em; background: transparent; opacity: .78; }
+    .nav-action::before { content: "↗"; margin-right: 5px; color: var(--cyan); }
+    .nav-action:hover { color: var(--cyan-2); opacity: 1; }
     .menu-btn { display:none; border:0; background:none; color:#fff; font-size:24px; }
     .hero { position: relative; min-height: 100svh; display: flex; align-items: center; justify-content: center; padding: 128px 28px 96px; overflow: hidden; background: #f3efe6; }
     .hero-bg { position: absolute; inset: 0; z-index: 0; }
@@ -99,6 +101,19 @@
     .case-figure { margin-top: 64px; }
     .case-figure .art-frame { max-width: 560px; margin-inline: auto; }
     .case-figure .art-frame img { cursor: zoom-in; }
+    .diagnosis-card { margin-top: 22px; display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(250px, .92fr); gap: 28px; align-items: stretch; padding: 18px; border: 1px solid rgba(23,52,90,.14); border-radius: 24px; background: rgba(255,255,255,.58); box-shadow: 0 18px 45px rgba(23,52,90,.08); }
+    .diagnosis-card .art-frame { margin: 0; max-width: none; padding: 10px; background: rgba(255,255,255,.72); border-color: rgba(23,52,90,.14); }
+    .diagnosis-card .art-frame img { width: 100%; height: auto; background: #f5f5ef; }
+    .diagnosis-copy { display: flex; flex-direction: column; justify-content: center; padding: 10px 10px 10px 0; }
+    .diagnosis-label { display: inline-flex; align-self: flex-start; margin-bottom: 14px; padding: 7px 10px; border-radius: 999px; color: #17345a; background: #b5fff1; font-size: 10px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+    .diagnosis-copy h3 { margin: 0; max-width: 390px; font-size: clamp(22px, 2.4vw, 31px); line-height: 1.12; letter-spacing: -.045em; }
+    .diagnosis-copy > p { margin: 14px 0 0; color: #5e7189; font-size: 15px; line-height: 1.6; }
+    .diagnosis-points { display: grid; gap: 9px; margin: 22px 0 0; }
+    .diagnosis-point { display: grid; grid-template-columns: 9px 1fr; gap: 10px; align-items: start; color: #506079; font-size: 13px; line-height: 1.45; }
+    .diagnosis-point i { width: 9px; height: 9px; margin-top: 5px; border-radius: 50%; background: #f29bb5; }
+    .diagnosis-point.success i { background: #178f86; }
+    .diagnosis-point strong { display: block; color: #17345a; font-size: 12px; letter-spacing: .02em; }
+    @media (max-width: 760px) { .diagnosis-card { grid-template-columns: 1fr; gap: 18px; padding: 12px; } .diagnosis-copy { padding: 4px 4px 8px; } }
     .qual-figures { margin-top: 76px; }
     .qual-figures .gallery-layout { margin-top: 28px; }
     .dark-section { background: var(--ink); color: var(--white); }
@@ -171,15 +186,15 @@
     .gallery { background:#0f1a31; color:var(--white); }
     .gallery .section-kicker { color:var(--orange); }
     .gallery .section-title em { color:var(--orange); }
-    .gallery-layout { display:grid; grid-template-columns: 280px 1fr; gap: 46px; margin-top: 54px; align-items:start; }
-    .gallery-tabs { display:grid; gap: 10px; }
-    .gallery-tab { text-align:left; border:1px solid rgba(255,255,255,.16); background:transparent; color:#9aa8bf; border-radius: 14px; padding: 17px; cursor:pointer; transition:.2s; }
+    .gallery-layout { display:grid; grid-template-columns: 1fr; gap: 22px; margin-top: 42px; align-items:start; }
+    .gallery-tabs { display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .gallery-tab { min-height: 78px; text-align:left; border:1px solid rgba(255,255,255,.16); background:transparent; color:#9aa8bf; border-radius: 14px; padding: 15px 17px; cursor:pointer; transition:.2s; }
     .gallery-tab:hover, .gallery-tab.is-active { color:var(--white); border-color:var(--orange); background:rgba(255,180,94,.1); }
     .gallery-tab strong { display:block; font-size:15px; }
     .gallery-tab span { display:block; margin-top: 5px; font-size:12px; line-height:1.4; }
     .gallery-display { min-width:0; }
     .gallery-display .art-frame { border-color:rgba(255,180,94,.35); }
-    .gallery-display img { aspect-ratio: 16 / 9; object-fit:contain; background:#f5f4ed; cursor:zoom-in; }
+    .gallery-display img { height: auto; aspect-ratio: auto; object-fit: contain; background:#f5f4ed; cursor:zoom-in; }
     .gallery-display img.tall { aspect-ratio: 1.15 / 1; }
     .gallery-meta { margin-top: 14px; display:flex; justify-content:space-between; gap:20px; color:#8998b1; font-size:12px; }
     .citation { background: var(--ink); color: var(--white); padding-bottom: 105px; }
@@ -250,7 +265,7 @@
     .brand { color: var(--ink); }
     .nav-links { color: #5d7390; }
     .nav-links a:hover, .nav-links a.active { color: var(--cyan-2); }
-    .nav-action { color: var(--cyan-2); border-color: rgba(23,127,131,.35); background: rgba(84,203,187,.12); }
+    .nav-action { color: #71859c; background: transparent; }
     .menu-btn { color: var(--ink); }
     .hero { color: var(--ink); background: #f3efe6; }
     .eyebrow { color: var(--cyan-2); }
@@ -722,10 +737,21 @@
           </figure>
         </div>
         <div class="case-figure reveal">
-          <p class="table-lead">Without verification feedback, the object stays where it started. Full WorldMirror diagnoses the failure and refines until the object reaches the target placement.</p>
-          <figure class="paper-table-block">
-            <div class="art-frame"><img class="zoomable" src="failure_case_diagnosis.png" width="1135" height="1312" alt="Failure diagnosis on a rail task. Without verification feedback the object stays still. Full WorldMirror diagnoses the failure and the object reaches the target." loading="lazy" decoding="async" /></div>
-          </figure>
+          <p class="table-lead">A single replay reveals the difference between stopping after failure and using verification to refine the world.</p>
+          <div class="diagnosis-card">
+            <figure class="art-frame">
+              <img class="zoomable" src="failure_case_diagnosis.png" width="1135" height="1312" alt="Failure diagnosis on a rail task. Without verification feedback the object stays still. Full WorldMirror diagnoses the failure and the object reaches the target." loading="lazy" decoding="async" />
+            </figure>
+            <div class="diagnosis-copy">
+              <span class="diagnosis-label">Failure diagnosis</span>
+              <h3>Verification closes the loop.</h3>
+              <p>WorldMirror reads the failed replay, identifies the mismatch, and refines the executable world until the object reaches its target placement.</p>
+              <div class="diagnosis-points">
+                <div class="diagnosis-point"><i></i><div><strong>Without verification</strong>The object stays where the first replay left it.</div></div>
+                <div class="diagnosis-point success"><i></i><div><strong>Full WorldMirror</strong>The failure is diagnosed and the placement is corrected.</div></div>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="placed-table reveal" id="refinement">
           <p class="table-lead">Effect of verification-driven adaptive refinement on replay performance. One-pass performs reconstruction followed by a single replay attempt. Fixed Iterative repeatedly applies refinement without failure-aware diagnosis. Full WorldMirror performs structured failure diagnosis and targeted refinement.</p>
@@ -760,8 +786,8 @@
                     <th scope="row">Fixed Iterative</th>
                     <td class="mark no" aria-label="No">✗</td>
                     <td class="num">31.77</td>
-                    <td class="num">–</td>
-                    <td class="num">–</td>
+                    <td class="num">2.16</td>
+                    <td class="num">0.40</td>
                     <td class="num">13.9</td>
                     <td class="num">13.90</td>
                     <td class="num">2</td>
@@ -851,7 +877,7 @@
 }</code></div></div></div>
     </section>
   </main>
-  <footer><div class="footer-inner"><span>WorldMirror · Agentic Real-to-Sim</span><span>Designed for GitHub Pages · static HTML</span></div></footer>
+  <footer><div class="footer-inner"><span>WorldMirror</span><span>Interactive research presentation</span></div></footer>
   <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Expanded figure"><button id="closeLightbox" aria-label="Close image">×</button><img id="lightboxImage" alt="" /></div>
 
   <script type="importmap">
@@ -1345,9 +1371,9 @@
       if (video.getAttribute('src') !== src) video.src = src;
     }
     const scenes = [
-      ['Can', 'Kitchen sink, with a can at the faucet.', 'rpl-164606/original.mp4', 'rpl-164606/original_wrist.mp4', 'rpl-164606/replay_cam_recon.mp4', 'rpl-164606/replay_cam_wrist.mp4'],
-      ['Block', 'Colored blocks on a wooden table.', 'rail-152727/original.mp4', 'rail-152727/original_wrist.mp4', 'rail-152727/replay_cam_recon.mp4', 'rail-152727/replay_cam_wrist.mp4'],
       ['Pot', 'Round table with a lidded pot, towel, and cups.', 'real-112523/20540549.mp4', 'real-112523/11744905.mp4', 'real-112523/replay_cam_recon.mp4', 'real-112523/replay_cam_wrist.mp4'],
+      ['Block', 'Colored blocks on a wooden table.', 'rail-152727/original.mp4', 'rail-152727/original_wrist.mp4', 'rail-152727/replay_cam_recon.mp4', 'rail-152727/replay_cam_wrist.mp4'],
+      ['Can', 'Kitchen sink, with a can at the faucet.', 'rpl-164606/original.mp4', 'rpl-164606/original_wrist.mp4', 'rpl-164606/replay_cam_recon.mp4', 'rpl-164606/replay_cam_wrist.mp4'],
       ['Orange cup', 'Workbench with a bowl and an orange cup.', 'autolab-084400/22008760.mp4', 'autolab-084400/18026681.mp4', 'autolab-084400/episode_0000000_cam_recon.mp4', 'autolab-084400/episode_0000000_cam_wrist.mp4'],
       ['Donut', 'Tabletop with a plate and small objects.', 'rail-105805/original.mp4', 'rail-105805/original_wrist.mp4', 'rail-105805/replay_cam_recon.mp4', 'rail-105805/replay_cam_wrist.mp4'],
       ['Fork', 'White table with a bottle, plate, and tray.', 'rad-180233/original.mp4', 'rad-180233/original_wrist.mp4', 'rad-180233/replay_cam_recon.mp4', 'rad-180233/replay_cam_wrist.mp4'],
@@ -1661,9 +1687,9 @@
 
     const baseRoot = 'baseline_source_stills/';
     const baselineScenes = [
-      ['rpl-164606', 'Can', 'Kitchen sink, with a can on the counter.', true],
-      ['rail-152727', 'Block', 'Colored blocks on a wooden table.', true],
       ['real-112523', 'Pot', 'Round table with a lidded pot, towel, and cups.', true],
+      ['rail-152727', 'Block', 'Colored blocks on a wooden table.', true],
+      ['rpl-164606', 'Can', 'Kitchen sink, with a can on the counter.', true],
       ['rail-105805', 'Donut', 'Tabletop with a plate and small objects.', true],
       ['rad-180233', 'Fork', 'White table with a bottle, plate, and tray.', true],
       ['iris-101439', 'Red pen 1', 'Round table with a bowl and a marker.', true],
