@@ -1800,13 +1800,16 @@
         video.hidden = false;
         if (key === 'ours') video.removeAttribute('poster');
         else video.poster = stillSrc;
-        // Use duration-normalized baseline clips so native progress bars match Real.
-        const src = `${baseRoot}${scene[0]}/${file}?v=dur-gt`;
-        clips.push({ key, video, fresh: '', fallback: src });
+        const freshOurs = key === 'ours' ? freshClip(scene[0], 'third') : '';
+        const bust = key === 'gt' ? '' : '?v=dur-gt3';
+        const fallback = freshOurs || `${baseRoot}${scene[0]}/${file}${bust}`;
+        clips.push({ key, video, fresh: freshOurs, fallback });
       });
-      const readyClips = clips.map((clip) => {
-        placeClip(clip.video, clip.fallback, clip.fallback);
-        return { key: clip.key, video: clip.video, src: clip.fallback, origin: clip.fallback };
+      const resolved = await Promise.all(clips.map(clip => clip.fresh ? resolvePlayable(clip.fresh) : Promise.resolve(clip.fallback)));
+      const readyClips = clips.map((clip, i) => {
+        const src = resolved[i];
+        placeClip(clip.video, src, clip.fresh || clip.fallback);
+        return { key: clip.key, video: clip.video, src, origin: clip.fresh || clip.fallback };
       });
       baseCaption.textContent = scene[2];
       const job = playSynced('base', readyClips);
