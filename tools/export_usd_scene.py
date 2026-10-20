@@ -240,8 +240,8 @@ def export_meshes(stage, output):
     print(f"render meshes: {mesh_count}, triangles: {triangle_count}, primitives: {len(primitives)}")
 
 
-def pad(data):
-    return data + b"\x00" * ((4 - len(data) % 4) % 4)
+def pad(data, fill=b"\x00"):
+    return data + fill * ((4 - len(data) % 4) % 4)
 
 
 def write_glb(primitives, materials, path):
@@ -291,7 +291,8 @@ def write_glb(primitives, materials, path):
         "bufferViews": views,
         "accessors": accessors,
     }
-    json_bytes = pad(json.dumps(document, separators=(",", ":")).encode("utf-8"))
+    # glTF requires JSON chunks padded with spaces (0x20), not NUL.
+    json_bytes = pad(json.dumps(document, separators=(",", ":")).encode("utf-8"), fill=b" ")
     bin_bytes = pad(bytes(blob))
     total = 12 + 8 + len(json_bytes) + 8 + len(bin_bytes)
     with open(path, "wb") as handle:

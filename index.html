@@ -320,14 +320,26 @@
     .shot figcaption { margin-top: 6px; color: #71859c; font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
     .demo-foot { margin-top: 16px; display: flex; justify-content: space-between; gap: 16px; align-items: center; }
     .scene-caption { margin: 0; color: #5e7189; font-size: 14px; line-height: 1.5; }
-    .method-board { margin-top: 22px; display: grid; grid-template-columns: repeat(5, minmax(200px, 1fr)); gap: 12px; overflow-x: auto; padding-bottom: 8px; }
+    .compare-block { margin-top: 28px; }
+    .compare-heading { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 10px 20px; margin: 0 2px 12px; }
+    .compare-heading h3 { margin: 0; font-size: 18px; letter-spacing: -.03em; color: #17345a; }
+    .compare-heading h3 span { display: block; margin-top: 3px; color: #71859c; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .compare-note { margin: 10px 2px 0; max-width: 640px; color: #5e7189; font-size: 13px; line-height: 1.45; }
+    .method-board { margin-top: 0; display: grid; grid-template-columns: repeat(5, minmax(200px, 1fr)); gap: 12px; overflow-x: auto; padding-bottom: 8px; }
+    .method-board.method-board-replay { grid-template-columns: repeat(4, minmax(200px, 1fr)); }
     .method-card { min-width: 200px; border: 1px solid rgba(23,52,90,.12); border-radius: 18px; background: rgba(255,255,255,.78); padding: 12px; }
     .method-card.is-ours { border-color: rgba(23,143,134,.55); }
     .method-card h3 { margin: 2px 4px 8px; font-size: 15px; letter-spacing: -.03em; }
     .method-card img, .method-card video, .clip-missing { width: 100%; aspect-ratio: 16 / 9; object-fit: contain; border-radius: 10px; background: #e4eeea; display: block; }
     .method-card img { cursor: zoom-in; }
-    .clip-missing { display: grid; place-items: center; color: #71859c; font-size: 12px; font-weight: 750; letter-spacing: .04em; text-align: center; padding: 8px; }
+    .clip-missing { display: grid; place-items: center; align-content: center; gap: 6px; color: #71859c; font-size: 12px; font-weight: 750; letter-spacing: .04em; text-align: center; padding: 14px 12px; }
+    .clip-missing strong { color: #17345a; font-size: 13px; letter-spacing: -.01em; }
+    .clip-missing span { display: block; max-width: 16em; margin: 0 auto; font-weight: 650; letter-spacing: 0; line-height: 1.4; color: #5e7189; }
     .clip-missing[hidden], .method-card video[hidden] { display: none; }
+    @media (max-width: 640px) {
+      .compare-heading { align-items: start; flex-direction: column; }
+      .compare-heading h3 { font-size: 16px; }
+    }
     .splat-stage { position: relative; width: 100%; aspect-ratio: 16 / 9; height: auto; margin-top: 18px; border-radius: 22px; overflow: hidden; background: #dfe8e4; border: 1px solid rgba(23,52,90,.12); }
     .splat-stage canvas { display: block; }
     .splat-status { position: absolute; left: 16px; bottom: 14px; z-index: 2; margin: 0; padding: 8px 12px; border-radius: 999px; background: rgba(251,250,246,.88); color: #17345a; font-size: 12px; font-weight: 750; pointer-events: none; }
@@ -533,7 +545,7 @@
 
     <section class="section scene-band" id="scene3d">
       <div class="section-inner">
-        <div class="reveal"><div class="section-kicker">Scene</div><h2 class="section-title">The reconstructed world, <em>from every side.</em></h2><p class="demo-lead">Eight DROID scenes, reconstructed the same way. The photo stays in the corner so the real first frame can be compared with the orbit. Drag to turn the full circle, and scroll to move closer.</p></div>
+        <div class="reveal"><div class="section-kicker">Scene</div><h2 class="section-title">The reconstructed world, <em>from every side.</em></h2><p class="demo-lead">Seven DROID scenes, reconstructed the same way. The photo stays in the corner so the real first frame can be compared with the orbit. Drag to turn the full circle, and scroll to move closer.</p></div>
         <div class="scene-switch" id="splatSwitch" role="tablist" aria-label="Reconstructed scenes"></div>
         <div class="splat-stage" id="splatStage">
           <figure class="splat-ref" id="splatRef"><img id="splatRefImg" alt="Real first frame of the selected scene"><figcaption><span>Real</span><span>First frame</span></figcaption></figure>
@@ -545,15 +557,35 @@
 
     <section class="section baselines" id="baselines">
       <div class="section-inner">
-        <div class="reveal"><div class="section-kicker">Comparison</div><h2 class="section-title">The same scene, <em>four reconstructions.</em></h2><p class="demo-lead">The recording next to RoboSnap, RoLA, GPT-6 Astra, and WorldMirror.</p></div>
+        <div class="reveal"><div class="section-kicker">Comparison</div><h2 class="section-title">The same scene, <em>four reconstructions.</em></h2><p class="demo-lead">First frames side by side, then the same recorded trajectory replayed in each reconstruction.</p></div>
         <div class="scene-switch" id="baseSwitch" role="tablist" aria-label="Comparison scenes"></div>
-        <div class="method-board" id="baseBoard">
-          <article class="method-card"><h3>Real</h3><figure class="shot"><img class="zoomable" data-still="gt" alt=""></figure><figure class="shot"><video data-video="gt" autoplay muted playsinline loop controls preload="none" aria-label="Real clip"></video><div class="clip-missing" data-empty="gt" hidden>No replay clip</div></figure></article>
-          <article class="method-card"><h3>RoboSnap</h3><figure class="shot"><img class="zoomable" data-still="robosnap" alt=""></figure><figure class="shot"><video data-video="robosnap" autoplay muted playsinline loop controls preload="none" aria-label="RoboSnap replay" hidden></video><div class="clip-missing" data-empty="robosnap">No replay clip</div></figure></article>
-          <article class="method-card"><h3>RoLA</h3><figure class="shot"><img class="zoomable" data-still="rola" alt=""></figure><figure class="shot"><video data-video="rola" autoplay muted playsinline loop controls preload="none" aria-label="RoLA replay"></video><div class="clip-missing" data-empty="rola" hidden>No replay clip</div></figure></article>
-          <article class="method-card"><h3>GPT-6 Astra</h3><figure class="shot"><img class="zoomable" data-still="gpt6" alt=""></figure><figure class="shot"><video data-video="gpt6" autoplay muted playsinline loop controls preload="none" aria-label="GPT-6 Astra replay"></video><div class="clip-missing" data-empty="gpt6" hidden>No replay clip</div></figure></article>
-          <article class="method-card is-ours"><h3>WorldMirror</h3><figure class="shot"><img class="zoomable" data-still="ours" alt=""></figure><figure class="shot"><video data-video="ours" autoplay muted playsinline loop controls preload="none" aria-label="WorldMirror replay"></video><div class="clip-missing" data-empty="ours" hidden>No replay clip</div></figure></article>
+
+        <div class="compare-block reveal">
+          <header class="compare-heading">
+            <h3>First frame<span>Appearance and layout at t = 0</span></h3>
+          </header>
+          <div class="method-board" id="baseStillBoard">
+            <article class="method-card"><h3>Real</h3><figure class="shot"><img class="zoomable" data-still="gt" alt=""></figure></article>
+            <article class="method-card"><h3>RoboSnap</h3><figure class="shot"><img class="zoomable" data-still="robosnap" alt=""></figure></article>
+            <article class="method-card"><h3>RoLA</h3><figure class="shot"><img class="zoomable" data-still="rola" alt=""></figure></article>
+            <article class="method-card"><h3>GPT-6 Astra</h3><figure class="shot"><img class="zoomable" data-still="gpt6" alt=""></figure></article>
+            <article class="method-card is-ours"><h3>WorldMirror</h3><figure class="shot"><img class="zoomable" data-still="ours" alt=""></figure></article>
+          </div>
+          <p class="compare-note">RoboSnap does not support robot-arm integration; we keep the same arm setting as WorldMirror.</p>
         </div>
+
+        <div class="compare-block reveal">
+          <header class="compare-heading">
+            <h3>Replay episode<span>Same recorded trajectory</span></h3>
+          </header>
+          <div class="method-board method-board-replay" id="baseReplayBoard">
+            <article class="method-card"><h3>Real</h3><figure class="shot"><video data-video="gt" autoplay muted playsinline loop controls preload="none" aria-label="Real clip"></video><div class="clip-missing" data-empty="gt" hidden><strong>No replay clip</strong></div></figure></article>
+            <article class="method-card"><h3>RoLA</h3><figure class="shot"><video data-video="rola" autoplay muted playsinline loop controls preload="none" aria-label="RoLA replay"></video><div class="clip-missing" data-empty="rola" hidden><strong>No replay clip</strong></div></figure></article>
+            <article class="method-card"><h3>GPT-6 Astra</h3><figure class="shot"><video data-video="gpt6" autoplay muted playsinline loop controls preload="none" aria-label="GPT-6 Astra replay"></video><div class="clip-missing" data-empty="gpt6" hidden><strong>No replay clip</strong></div></figure></article>
+            <article class="method-card is-ours"><h3>WorldMirror</h3><figure class="shot"><video data-video="ours" autoplay muted playsinline loop controls preload="none" aria-label="WorldMirror replay"></video><div class="clip-missing" data-empty="ours" hidden><strong>No replay clip</strong></div></figure></article>
+          </div>
+        </div>
+
         <div class="demo-foot"><p class="scene-caption" id="baseCaption"></p></div>
       </div>
     </section>
@@ -922,8 +954,7 @@
       ["Fork", "White table with a bottle, plate, and tray.", "rad-180233-ext1-rodin", [-0.2282, 0.5917, -0.8836], [-0.2734, 1.364, 0.9098], [-0.038, 0.9174, -0.396], 69.22, 649.276, 357.111],
       ["Red pen 1", "Round table with a bowl and a marker.", "iris-101439-ext1-rodin", [-0.0067, 0.0066, -1.3693], [-0.0624, 1.1628, -0.051], [-0.0389, 0.7504, -0.6598], 69.15, 640.491, 353.232],
       ["Red pen 2", "Round table with a blue cup and a marker.", "iris-153900-ext2", [-1.9153, -0.9669, -0.3007], [-1.969, 1.303, 1.8216], [0.0374, 0.683, -0.7295], 69.10, 639.236, 352.502],
-      ["Black pen", "Wooden table with a black cup and calibration boards.", "iliad-161943-ext2-rodin", [0.1628, 0.2043, -1.3399], [0.2903, 1.2713, -0.1885], [-0.1228, 0.7346, -0.6672], 68.20, 656.275, 360.359],
-      ["Spoon", "Cutlery tray on a white table.", "rad-155000-ext2-rodin", [-0.0057, -0.0119, -0.9785], [0.0049, 0.4098, -0.0718], [0.0131, 0.9066, -0.4219], 68.83, 648.118, 374.606]
+      ["Black pen", "Wooden table with a black cup and calibration boards.", "iliad-161943-ext2-rodin", [0.1628, 0.2043, -1.3399], [0.2903, 1.2713, -0.1885], [-0.1228, 0.7346, -0.6672], 68.20, 656.275, 360.359]
     ];
     const viewer = new GaussianSplats3D.Viewer({
       rootElement: stage,
@@ -1167,7 +1198,7 @@
           postSplatScene.remove(postSplatRoot);
           postSplatRoot = null;
         }
-        const propsPromise = loader.loadAsync("scene/droid/" + scene[2] + ".glb?v=11");
+        const propsPromise = loader.loadAsync("scene/droid/" + scene[2] + ".glb?v=15");
         await viewer.addSplatScene("scene/droid/" + scene[2] + ".v8.ply", {
           showLoadingUI: false,
           progressiveLoad: false,
@@ -1638,8 +1669,28 @@
           if (!alive() || reason === 'aborted') return;
         }
         if (!alive()) return;
+        // Comparison clips are authored at different fps / cuts. Stretch each
+        // video's playbackRate so one loop matches the Real (gt) wall-clock
+        // duration, then restart together when Real ends.
+        let syncTarget = 0;
+        let masterVideo = null;
+        if (group === 'base') {
+          const gt = list.find(clip => clip.key === 'gt');
+          masterVideo = gt && gt.video && !gt.video.hidden ? gt.video : null;
+          const gtDur = masterVideo && Number.isFinite(masterVideo.duration) ? masterVideo.duration : 0;
+          const durs = mounted.map(video => video.duration).filter(d => Number.isFinite(d) && d > 0);
+          syncTarget = gtDur > 0 ? gtDur : (durs.length ? Math.max(...durs) : 0);
+          if (!masterVideo) masterVideo = mounted[0] || null;
+        }
         mounted.forEach(video => {
           if (!video || video.error || video.hidden || !video.getAttribute('src')) return;
+          if (group === 'base' && syncTarget > 0 && Number.isFinite(video.duration) && video.duration > 0) {
+            video.playbackRate = video.duration / syncTarget;
+            video.loop = false;
+          } else {
+            video.playbackRate = 1;
+            video.loop = true;
+          }
           if (video.dataset.userPaused === '1') {
             video.dataset.syncLive = '1';
             return;
@@ -1649,6 +1700,23 @@
           video.controls = true;
           video.play().catch(() => {});
         });
+        if (group === 'base' && syncTarget > 0 && masterVideo) {
+          const restart = () => {
+            if (!alive()) return;
+            mounted.forEach(video => {
+              if (!video || video.error || video.hidden || !video.getAttribute('src')) return;
+              if (video.dataset.userPaused === '1') return;
+              try { video.currentTime = 0; } catch (e) {}
+              video.play().catch(() => {});
+            });
+          };
+          const onEnded = () => {
+            if (!alive() || masterVideo.dataset.syncLive !== '1') return;
+            restart();
+          };
+          masterVideo.addEventListener('ended', onEnded);
+          run.signal.addEventListener('abort', () => masterVideo.removeEventListener('ended', onEnded), { once: true });
+        }
       } finally {
         activePlaybacks -= 1;
       }
@@ -1700,9 +1768,9 @@
       ['guptalab-153414', 'Cabinet', 'Cabinet and sink workspace.', true],
       ['rad-155000', 'Spoon', 'Cutlery tray on a white table.', true]
     ];
-    const baseMethods = {
+    const baseStillKeys = ['gt', 'robosnap', 'rola', 'gpt6', 'ours'];
+    const baseReplayMethods = {
       gt: 'videos/gt.mp4',
-      robosnap: null,
       rola: 'videos/rola.mp4',
       gpt6: 'videos/gpt6.mp4',
       ours: 'videos/ours_isaac_invert.mp4'
@@ -1712,8 +1780,10 @@
     const baseStills = {};
     const baseVideos = {};
     const baseEmpty = {};
-    Object.keys(baseMethods).forEach(key => {
+    baseStillKeys.forEach(key => {
       baseStills[key] = document.querySelector(`[data-still="${key}"]`);
+    });
+    Object.keys(baseReplayMethods).forEach(key => {
       baseVideos[key] = document.querySelector(`[data-video="${key}"]`);
       baseEmpty[key] = document.querySelector(`[data-empty="${key}"]`);
       bindUserPause(baseVideos[key]);
@@ -1727,13 +1797,16 @@
         tab.classList.toggle('is-active', on);
         tab.setAttribute('aria-selected', on ? 'true' : 'false');
       });
-      const clips = [];
-      Object.entries(baseMethods).forEach(([key, file]) => {
-        const stillBust = scene[0] === 'rad-155000' ? '?v=replay53' : (scene[0] === 'guptalab-153414' ? '?v=replay6' : '');
+      const stillBust = scene[0] === 'rad-155000' ? '?v=replay53' : (scene[0] === 'guptalab-153414' ? '?v=replay6' : '');
+      baseStillKeys.forEach(key => {
         const stillSrc = `${baseRoot}${scene[0]}/${key}.png${stillBust}`;
         baseStills[key].fetchPriority = 'low';
         baseStills[key].src = stillSrc;
         baseStills[key].alt = `${scene[1]}, ${key === 'gt' ? 'recorded frame' : 'reconstructed frame'}`;
+      });
+      const clips = [];
+      Object.entries(baseReplayMethods).forEach(([key, file]) => {
+        const stillSrc = `${baseRoot}${scene[0]}/${key}.png${stillBust}`;
         const video = baseVideos[key];
         const hasVideo = Boolean(file) && (key !== 'ours' || scene[3]);
         delete video.dataset.syncLive;
@@ -1763,13 +1836,13 @@
         if (key === 'ours') video.removeAttribute('poster');
         else video.poster = stillSrc;
         const freshOurs = key === 'ours' ? freshClip(scene[0], 'third') : '';
-        clips.push({ video, fresh: freshOurs, fallback: freshOurs || `${baseRoot}${scene[0]}/${file}` });
+        clips.push({ key, video, fresh: freshOurs, fallback: freshOurs || `${baseRoot}${scene[0]}/${file}` });
       });
       const resolved = await Promise.all(clips.map(clip => clip.fresh ? resolvePlayable(clip.fresh) : Promise.resolve(clip.fallback)));
       const readyClips = clips.map((clip, i) => {
         const src = resolved[i];
         placeClip(clip.video, src, clip.fresh || clip.fallback);
-        return { video: clip.video, src, origin: clip.fresh || clip.fallback };
+        return { key: clip.key, video: clip.video, src, origin: clip.fresh || clip.fallback };
       });
       baseCaption.textContent = scene[2];
       const job = playSynced('base', readyClips);
