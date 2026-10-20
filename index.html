@@ -513,7 +513,7 @@
 
     <section class="section demos" id="replay">
       <div class="section-inner">
-        <div class="reveal"><div class="section-kicker">03 · Demos</div><h2 class="section-title">The same trajectory, <em>in the mirror.</em></h2><p class="demo-lead">Ten DROID demonstrations. Each one pairs the real exterior and wrist views with the WorldMirror replay of that trajectory.</p></div>
+        <div class="reveal"><div class="section-kicker">03 · Demos</div><h2 class="section-title">The same trajectory, <em>in the mirror.</em></h2><p class="demo-lead">Eleven DROID demonstrations. Each one pairs the real exterior and wrist views with the WorldMirror replay of that trajectory.</p></div>
         <div class="scene-switch" id="sceneSwitch" role="tablist" aria-label="Replay scenes"></div>
         <div class="compare">
           <div class="compare-col">
@@ -533,7 +533,7 @@
 
     <section class="section scene-band" id="scene3d">
       <div class="section-inner">
-        <div class="reveal"><div class="section-kicker">Scene</div><h2 class="section-title">The reconstructed world, <em>from every side.</em></h2><p class="demo-lead">Seven DROID scenes, reconstructed the same way. The photo stays in the corner so the real first frame can be compared with the orbit. Drag to turn the full circle, and scroll to move closer.</p></div>
+        <div class="reveal"><div class="section-kicker">Scene</div><h2 class="section-title">The reconstructed world, <em>from every side.</em></h2><p class="demo-lead">Eight DROID scenes, reconstructed the same way. The photo stays in the corner so the real first frame can be compared with the orbit. Drag to turn the full circle, and scroll to move closer.</p></div>
         <div class="scene-switch" id="splatSwitch" role="tablist" aria-label="Reconstructed scenes"></div>
         <div class="splat-stage" id="splatStage">
           <figure class="splat-ref" id="splatRef"><img id="splatRefImg" alt="Real first frame of the selected scene"><figcaption><span>Real</span><span>First frame</span></figcaption></figure>
@@ -922,7 +922,8 @@
       ["Fork", "White table with a bottle, plate, and tray.", "rad-180233-ext1-rodin", [-0.2282, 0.5917, -0.8836], [-0.2734, 1.364, 0.9098], [-0.038, 0.9174, -0.396], 69.22, 649.276, 357.111],
       ["Red pen 1", "Round table with a bowl and a marker.", "iris-101439-ext1-rodin", [-0.0067, 0.0066, -1.3693], [-0.0624, 1.1628, -0.051], [-0.0389, 0.7504, -0.6598], 69.15, 640.491, 353.232],
       ["Red pen 2", "Round table with a blue cup and a marker.", "iris-153900-ext2", [-1.9153, -0.9669, -0.3007], [-1.969, 1.303, 1.8216], [0.0374, 0.683, -0.7295], 69.10, 639.236, 352.502],
-      ["Black pen", "Wooden table with a black cup and calibration boards.", "iliad-161943-ext2-rodin", [0.1628, 0.2043, -1.3399], [0.2903, 1.2713, -0.1885], [-0.1228, 0.7346, -0.6672], 68.20, 656.275, 360.359]
+      ["Black pen", "Wooden table with a black cup and calibration boards.", "iliad-161943-ext2-rodin", [0.1628, 0.2043, -1.3399], [0.2903, 1.2713, -0.1885], [-0.1228, 0.7346, -0.6672], 68.20, 656.275, 360.359],
+      ["Spoon", "Cutlery tray on a white table.", "rad-155000-ext2-rodin", [-0.0057, -0.0119, -0.9785], [0.0049, 0.4098, -0.0718], [0.0131, 0.9066, -0.4219], 68.83, 648.118, 374.606]
     ];
     const viewer = new GaussianSplats3D.Viewer({
       rootElement: stage,
@@ -1380,7 +1381,8 @@
       ['Red pen 1', 'Round table with a bowl and a marker.', 'iris-101439/original.mp4', 'iris-101439/original_wrist.mp4', 'iris-101439/replay_cam_recon.mp4', 'iris-101439/replay_cam_wrist.mp4'],
       ['Red pen 2', 'Round table with a blue cup and a marker.', 'iris-153900/original.mp4', 'iris-153900/original_wrist.mp4', 'iris-153900/replay_cam_recon.mp4', 'iris-153900/replay_cam_wrist.mp4'],
       ['Black pen', 'Wooden table with a black cup and calibration boards.', 'iliad-161943/original.mp4', 'iliad-161943/original_wrist.mp4', 'iliad-161943/replay_cam_recon.mp4', 'iliad-161943/replay_cam_wrist.mp4'],
-      ['Cabinet', 'Cabinet and sink workspace.', 'guptalab-153414/original.mp4', 'guptalab-153414/original_wrist.mp4', 'guptalab-153414/replay_cam_recon.mp4', 'guptalab-153414/replay_cam_wrist.mp4']
+      ['Cabinet', 'Cabinet and sink workspace.', 'guptalab-153414/original.mp4', 'guptalab-153414/original_wrist.mp4', 'guptalab-153414/replay_cam_recon.mp4', 'guptalab-153414/replay_cam_wrist.mp4'],
+      ['Spoon', 'Cutlery tray on a white table.', 'rad-155000/original.mp4', 'rad-155000/original_wrist.mp4', 'rad-155000/replay_cam_recon.mp4', 'rad-155000/replay_cam_wrist.mp4']
     ];
     const sceneSwitch = document.getElementById('sceneSwitch');
     const sceneCaption = document.getElementById('sceneCaption');
@@ -1696,7 +1698,7 @@
       ['iris-153900', 'Red pen 2', 'Round table with a blue cup and a marker.', true],
       ['iliad-161943', 'Black pen', 'Wooden table with a black cup and calibration boards.', true],
       ['guptalab-153414', 'Cabinet', 'Cabinet and sink workspace.', true],
-      ['rad-155000', 'Spoon', 'Cutlery tray on a white table.', false]
+      ['rad-155000', 'Spoon', 'Cutlery tray on a white table.', true]
     ];
     const baseMethods = {
       gt: 'videos/gt.mp4',
@@ -1727,7 +1729,8 @@
       });
       const clips = [];
       Object.entries(baseMethods).forEach(([key, file]) => {
-        const stillSrc = `${baseRoot}${scene[0]}/${key}.png`;
+        const stillBust = scene[0] === 'rad-155000' ? '?v=replay53' : (scene[0] === 'guptalab-153414' ? '?v=replay6' : '');
+        const stillSrc = `${baseRoot}${scene[0]}/${key}.png${stillBust}`;
         baseStills[key].fetchPriority = 'low';
         baseStills[key].src = stillSrc;
         baseStills[key].alt = `${scene[1]}, ${key === 'gt' ? 'recorded frame' : 'reconstructed frame'}`;
