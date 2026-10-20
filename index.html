@@ -1669,28 +1669,10 @@
           if (!alive() || reason === 'aborted') return;
         }
         if (!alive()) return;
-        // Comparison clips are authored at different fps / cuts. Stretch each
-        // video's playbackRate so one loop matches the Real (gt) wall-clock
-        // duration, then restart together when Real ends.
-        let syncTarget = 0;
-        let masterVideo = null;
-        if (group === 'base') {
-          const gt = list.find(clip => clip.key === 'gt');
-          masterVideo = gt && gt.video && !gt.video.hidden ? gt.video : null;
-          const gtDur = masterVideo && Number.isFinite(masterVideo.duration) ? masterVideo.duration : 0;
-          const durs = mounted.map(video => video.duration).filter(d => Number.isFinite(d) && d > 0);
-          syncTarget = gtDur > 0 ? gtDur : (durs.length ? Math.max(...durs) : 0);
-          if (!masterVideo) masterVideo = mounted[0] || null;
-        }
         mounted.forEach(video => {
           if (!video || video.error || video.hidden || !video.getAttribute('src')) return;
-          if (group === 'base' && syncTarget > 0 && Number.isFinite(video.duration) && video.duration > 0) {
-            video.playbackRate = video.duration / syncTarget;
-            video.loop = false;
-          } else {
-            video.playbackRate = 1;
-            video.loop = true;
-          }
+          video.playbackRate = 1;
+          video.loop = true;
           if (video.dataset.userPaused === '1') {
             video.dataset.syncLive = '1';
             return;
@@ -1700,23 +1682,6 @@
           video.controls = true;
           video.play().catch(() => {});
         });
-        if (group === 'base' && syncTarget > 0 && masterVideo) {
-          const restart = () => {
-            if (!alive()) return;
-            mounted.forEach(video => {
-              if (!video || video.error || video.hidden || !video.getAttribute('src')) return;
-              if (video.dataset.userPaused === '1') return;
-              try { video.currentTime = 0; } catch (e) {}
-              video.play().catch(() => {});
-            });
-          };
-          const onEnded = () => {
-            if (!alive() || masterVideo.dataset.syncLive !== '1') return;
-            restart();
-          };
-          masterVideo.addEventListener('ended', onEnded);
-          run.signal.addEventListener('abort', () => masterVideo.removeEventListener('ended', onEnded), { once: true });
-        }
       } finally {
         activePlaybacks -= 1;
       }
@@ -1835,14 +1800,13 @@
         video.hidden = false;
         if (key === 'ours') video.removeAttribute('poster');
         else video.poster = stillSrc;
-        const freshOurs = key === 'ours' ? freshClip(scene[0], 'third') : '';
-        clips.push({ key, video, fresh: freshOurs, fallback: freshOurs || `${baseRoot}${scene[0]}/${file}` });
+        // Use duration-normalized baseline clips so native progress bars match Real.
+        const src = `${baseRoot}${scene[0]}/${file}?v=dur-gt`;
+        clips.push({ key, video, fresh: '', fallback: src });
       });
-      const resolved = await Promise.all(clips.map(clip => clip.fresh ? resolvePlayable(clip.fresh) : Promise.resolve(clip.fallback)));
-      const readyClips = clips.map((clip, i) => {
-        const src = resolved[i];
-        placeClip(clip.video, src, clip.fresh || clip.fallback);
-        return { key: clip.key, video: clip.video, src, origin: clip.fresh || clip.fallback };
+      const readyClips = clips.map((clip) => {
+        placeClip(clip.video, clip.fallback, clip.fallback);
+        return { key: clip.key, video: clip.video, src: clip.fallback, origin: clip.fallback };
       });
       baseCaption.textContent = scene[2];
       const job = playSynced('base', readyClips);
