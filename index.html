@@ -34,17 +34,17 @@
     .progress { position: fixed; inset: 0 0 auto; height: 3px; background: linear-gradient(90deg, var(--cyan), var(--lime), var(--orange)); transform-origin: left; transform: scaleX(0); z-index: 100; }
     .site-nav { position: fixed; top: 3px; left: 0; width: 100%; z-index: 90; transition: background .3s ease, box-shadow .3s ease; }
     .site-nav.scrolled { background: rgba(10,16,33,.88); backdrop-filter: blur(18px); box-shadow: 0 8px 34px rgba(0,0,0,.18); }
-    .nav-inner { max-width: var(--max); margin: auto; display:flex; align-items:center; justify-content:space-between; padding: 18px 28px; }
-    .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--white); font-weight: 800; letter-spacing: -.04em; }
+    .nav-inner { max-width: var(--max); margin: auto; display:grid; grid-template-columns: 1fr auto 1fr; align-items:center; padding: 18px 28px; }
+    .brand { grid-column: 1; justify-self: start; display: inline-flex; align-items: center; gap: 10px; color: var(--white); font-weight: 800; letter-spacing: -.04em; }
     .brand-mark { display: block; width: 34px; height: 34px; flex: none; border-radius: 50%; overflow: hidden; border: 1px solid rgba(23,52,90,.35); box-shadow: 0 0 0 3px rgba(84,203,187,.16); }
     .brand-mark img { width: 100%; height: 100%; max-width: none; object-fit: cover; transform: scale(1.16); transform-origin: center; }
-    .nav-links { display:flex; gap: 24px; align-items:center; color: #c3cadd; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .nav-links { grid-column: 2; justify-self: center; display:flex; gap: 24px; align-items:center; color: #c3cadd; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
     .nav-links a { opacity: .75; transition: color .2s, opacity .2s; }
     .nav-links a:hover, .nav-links a.active { color: var(--cyan-2); opacity: 1; }
     .nav-action { border: 0; color: #9aa8bf; border-radius: 0; padding: 5px 0; font-size: 10px; letter-spacing: .12em; background: transparent; opacity: .78; }
     .nav-action::before { content: "↗"; margin-right: 5px; color: var(--cyan); }
     .nav-action:hover { color: var(--cyan-2); opacity: 1; }
-    .menu-btn { display:none; border:0; background:none; color:#fff; font-size:24px; }
+    .menu-btn { grid-column: 3; justify-self: end; display:none; border:0; background:none; color:#fff; font-size:24px; }
     .hero { position: relative; min-height: 100svh; display: flex; align-items: center; justify-content: center; padding: 128px 28px 96px; overflow: hidden; background: #f3efe6; }
     .hero-bg { position: absolute; inset: 0; z-index: 0; }
     .hero-bg video { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: center 42%; display: block; opacity: 0; z-index: 0; transition: opacity .4s linear; }
@@ -152,7 +152,11 @@
     .bar-row { display:grid; grid-template-columns: 126px 1fr 54px; gap: 12px; align-items:center; font-size:12px; }
     .bar-row label { color:#4d5b72; font-weight:700; }
     .bar-track { height: 10px; border-radius:20px; background:#d3d0c7; overflow:hidden; }
-    .bar-fill { width:0; height:100%; border-radius:20px; background:linear-gradient(90deg, #6ccfc0, #b4ef7b); transition: width 1.2s cubic-bezier(.2,.75,.25,1); }
+    .bar-fill { width:0; height:100%; border-radius:20px; background:linear-gradient(90deg, #6ccfc0, #b4ef7b); transition: width 1.05s cubic-bezier(.2,.75,.25,1); }
+    .metric-bars.will-play .bar-row { opacity:0; transform:translateY(8px); transition:opacity .4s ease, transform .4s ease; }
+    .metric-bars.will-play.is-on .bar-row { opacity:1; transform:none; }
+    .metric-bars.will-play + .chart-caption { opacity:0; transition:opacity .4s ease; }
+    .metric-bars.will-play.is-on + .chart-caption { opacity:1; }
     .bar-row small { text-align:right; color:#748098; font:700 11px ui-monospace,monospace; }
     .chart-card { background:var(--paper); border:1px solid var(--line); border-radius: 18px; padding: 13px; }
     .chart-card img { width:100%; image-rendering:auto; border-radius: 10px; }
@@ -208,10 +212,24 @@
     .footer-inner { max-width:var(--max); margin:auto; display:flex; justify-content:space-between; gap:20px; }
     .reveal { opacity:1; transform:translateY(22px); transition:opacity .65s ease, transform .65s ease; }
     .reveal.visible { opacity:1; transform:none; }
+    .paper-table.play.is-on tbody tr:not(.wm):not(.group) { animation:rowWash .7s ease both; }
+    .paper-table.marks.play.is-on tbody tr { animation:none; }
+    .paper-table.marks.play.is-on td.wm { animation:wmGlow .85s ease; }
+    @keyframes rowWash { 0% { background-color:rgba(84,203,187,.22); } 100% { background-color:transparent; } }
+    @keyframes wmGlow { 0% { box-shadow:inset 0 0 0 0 rgba(84,203,187,0); } 40% { box-shadow:inset 0 0 0 999px rgba(84,203,187,.5); } 100% { box-shadow:inset 0 0 0 0 rgba(84,203,187,0); } }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { transform:none; transition:none; }
+      .bar-fill, .paper-table.play.is-on tbody tr, .paper-table.marks.play.is-on td.wm { transition:none; animation:none; }
+      .metric-bars.will-play .bar-row, .metric-bars.will-play + .chart-caption { opacity:1; transform:none; transition:none; }
+    }
     .lightbox { position:fixed; inset:0; z-index:120; display:grid; place-items:center; padding:30px; background:rgba(3,6,16,.9); opacity:0; visibility:hidden; transition:.25s; }
     .lightbox.open { opacity:1; visibility:visible; }
     .lightbox img { max-width:min(1300px, 94vw); max-height:88vh; object-fit:contain; border:1px solid rgba(255,255,255,.35); border-radius:12px; background:#f5f4ed; }
     .lightbox button { position:absolute; right:25px; top:20px; color:#fff; background:none; border:0; font-size:30px; cursor:pointer; }
+    @media (max-width: 1100px) {
+      .nav-inner { display:flex; justify-content:space-between; }
+      .brand, .nav-links, .menu-btn { grid-column: auto; justify-self: auto; }
+    }
     @media (max-width: 940px) {
       .hero { padding-top: 112px; }
       .intro-grid, .method-intro, .evidence-grid, .citation-grid { grid-template-columns:1fr; gap:32px; }
@@ -419,7 +437,7 @@
         <figure class="paper-table-block reveal">
           <figcaption>Table 1</figcaption>
           <div class="paper-table-scroll" tabindex="0">
-            <table class="paper-table wide">
+            <table class="paper-table wide marks play">
               <thead>
                 <tr>
                   <th scope="col" class="left">Capability</th>
@@ -598,7 +616,7 @@
           <figure class="paper-table-block">
             <figcaption>Table 2</figcaption>
             <div class="paper-table-scroll" tabindex="0">
-              <table class="paper-table">
+              <table class="paper-table play">
                 <thead>
                   <tr>
                     <th scope="col" class="left">Type</th>
@@ -656,7 +674,7 @@
           <figure class="paper-table-block">
             <figcaption>Table 3</figcaption>
             <div class="paper-table-scroll" tabindex="0">
-              <table class="paper-table">
+              <table class="paper-table play">
                 <thead>
                   <tr>
                     <th scope="col" class="left">Category</th>
@@ -712,14 +730,14 @@
           </figure>
         </div>
         <div class="reveal subsection-head" id="evidence"><h2 class="section-title">Fidelity is a <em>three-part contract.</em></h2></div>
-        <div class="metric-strip"><article class="metric-card cyan reveal"><span>Motion replay</span><strong>1.79 cm</strong><p>Displacement error when the recorded trajectory is replayed in Isaac Sim.</p></article><article class="metric-card orange reveal"><span>Physical interaction</span><strong>0.873</strong><p>Contact F1 during that same replay.</p></article><article class="metric-card lime reveal"><span>Replay success</span><strong>100%</strong><p>Recorded trajectories that complete in simulation, without retargeting.</p></article></div>
-        <div class="evidence-grid"><div class="evidence-copy reveal"><h3>The recorded motion still fits the reconstructed world.</h3><p>The comparison is trajectory replay in Isaac Sim, not a real-robot policy evaluation. Lower displacement error means the replay stays closer to the demonstration.</p></div><div class="chart-card reveal"><div class="metric-bars"><div class="bar-row"><label>WorldMirror</label><div class="bar-track"><div class="bar-fill" data-width="94%"></div></div><small>1.79</small></div><div class="bar-row"><label>GPT-6 Astra</label><div class="bar-track"><div class="bar-fill" data-width="48%"></div></div><small>11.17</small></div><div class="bar-row"><label>RoLA</label><div class="bar-track"><div class="bar-fill" data-width="18%"></div></div><small>24.70</small></div></div><p class="chart-caption">Displacement error in centimeters. Longer bars correspond to lower error.</p></div></div>
+        <div class="metric-strip"><article class="metric-card cyan reveal"><span>Motion replay</span><strong data-count="1.79" data-decimals="2" data-suffix=" cm">1.79 cm</strong><p>Displacement error when the recorded trajectory is replayed in Isaac Sim.</p></article><article class="metric-card orange reveal"><span>Physical interaction</span><strong data-count="0.873" data-decimals="3">0.873</strong><p>Contact F1 during that same replay.</p></article><article class="metric-card lime reveal"><span>Replay success</span><strong data-count="100" data-decimals="0" data-suffix="%">100%</strong><p>Recorded trajectories that complete in simulation, without retargeting.</p></article></div>
+        <div class="evidence-grid"><div class="evidence-copy reveal"><h3>The recorded motion still fits the reconstructed world.</h3><p>The comparison is trajectory replay in Isaac Sim, not a real-robot policy evaluation. Lower displacement error means the replay stays closer to the demonstration.</p></div><div class="chart-card reveal"><div class="metric-bars"><div class="bar-row"><label>WorldMirror</label><div class="bar-track"><div class="bar-fill" data-width="94%"></div></div><small data-count="1.79" data-decimals="2">1.79</small></div><div class="bar-row"><label>GPT-6 Astra</label><div class="bar-track"><div class="bar-fill" data-width="48%"></div></div><small data-count="11.17" data-decimals="2">11.17</small></div><div class="bar-row"><label>RoLA</label><div class="bar-track"><div class="bar-fill" data-width="18%"></div></div><small data-count="24.70" data-decimals="2">24.70</small></div></div><p class="chart-caption">Displacement error in centimeters. Longer bars correspond to lower error.</p></div></div>
         <div class="placed-table reveal" id="motion-replay">
           <p class="table-lead">The cards above are the headline of this table: trajectory replay in Isaac Sim, not a real-robot policy result.</p>
           <figure class="paper-table-block">
             <figcaption>Table 4</figcaption>
             <div class="paper-table-scroll" tabindex="0">
-              <table class="paper-table">
+              <table class="paper-table play">
                 <thead>
                   <tr>
                     <th scope="col" class="left" rowspan="2">Method</th>
@@ -790,7 +808,7 @@
           <figure class="paper-table-block">
             <figcaption>Table 5</figcaption>
             <div class="paper-table-scroll" tabindex="0">
-              <table class="paper-table">
+              <table class="paper-table play">
                 <thead>
                   <tr>
                     <th scope="col" class="left">Strategy</th>
@@ -844,7 +862,7 @@
           <figure class="paper-table-block">
             <figcaption>Table 6</figcaption>
             <div class="paper-table-scroll" tabindex="0">
-              <table class="paper-table">
+              <table class="paper-table play">
                 <thead>
                   <tr>
                     <th scope="col" class="left">Variant</th>
@@ -1331,7 +1349,85 @@
 
     const revealObserver = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); revealObserver.unobserve(entry.target); } }), {threshold:.12});
     document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
-    const barObserver = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) { entry.target.querySelectorAll('.bar-fill').forEach(bar => bar.style.width = bar.dataset.width); barObserver.unobserve(entry.target); } }), {threshold:.3});
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function countUp(el, value, decimals, suffix, duration) {
+      const paint = (n) => { el.textContent = (decimals ? n.toFixed(decimals) : String(Math.round(n))) + (suffix || ''); };
+      if (reduceMotion) { paint(value); return; }
+      const start = performance.now();
+      paint(0);
+      const frame = (now) => {
+        const t = Math.min(1, (now - start) / duration);
+        const eased = 1 - Math.pow(1 - t, 3);
+        paint(value * eased);
+        if (t < 1) requestAnimationFrame(frame);
+        else paint(value);
+      };
+      requestAnimationFrame(frame);
+    }
+    document.querySelectorAll('.paper-table.play').forEach(table => {
+      const marks = table.classList.contains('marks');
+      [...table.tBodies[0].rows].forEach((row, i) => {
+        const base = i * (marks ? 50 : 70);
+        if (reduceMotion) return;
+        if (marks) {
+          [...row.children].forEach((cell, c) => {
+            if (!cell.classList.contains('mark')) return;
+            cell.style.animationDelay = (base + (cell.classList.contains('wm') ? 360 : Math.max(0, c - 1) * 45)) + 'ms';
+          });
+        } else {
+          row.style.animationDelay = (base + (row.classList.contains('wm') ? 90 : 0)) + 'ms';
+        }
+      });
+    });
+    const tableObserver = new IntersectionObserver(entries => entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const table = entry.target;
+      table.classList.add('is-on');
+      if (!reduceMotion && !table.classList.contains('marks')) {
+        table.querySelectorAll('tr.wm td.num').forEach(cell => {
+          const node = cell.querySelector('strong') || cell;
+          const match = node.textContent.trim().match(/^(-?\d+(?:\.\d+)?)(.*)$/);
+          if (!match) return;
+          const decimals = (match[1].split('.')[1] || '').length;
+          const delay = parseFloat(cell.parentElement.style.animationDelay) || 0;
+          setTimeout(() => countUp(node, Number(match[1]), decimals, match[2], 650), delay);
+        });
+      }
+      tableObserver.unobserve(table);
+    }), {threshold:.08});
+    document.querySelectorAll('.paper-table.play').forEach(table => tableObserver.observe(table));
+    const metricObserver = new IntersectionObserver(entries => entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.querySelectorAll('strong[data-count]').forEach(el => countUp(el, Number(el.dataset.count), Number(el.dataset.decimals || 0), el.dataset.suffix || '', 900));
+      metricObserver.unobserve(entry.target);
+    }), {threshold:.4});
+    document.querySelectorAll('.metric-card').forEach(card => metricObserver.observe(card));
+    document.querySelectorAll('.metric-bars').forEach(bars => {
+      if (reduceMotion) return;
+      bars.classList.add('will-play');
+      bars.querySelectorAll('.bar-row').forEach((row, i) => {
+        const delay = i * 160;
+        row.style.transitionDelay = delay + 'ms';
+        const fill = row.querySelector('.bar-fill');
+        if (fill) fill.style.transitionDelay = (delay + 120) + 'ms';
+      });
+      const caption = bars.nextElementSibling;
+      if (caption && caption.classList.contains('chart-caption')) caption.style.transitionDelay = '640ms';
+    });
+    const barObserver = new IntersectionObserver(entries => entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const bars = entry.target;
+      bars.classList.add('is-on');
+      bars.querySelectorAll('.bar-row').forEach((row, i) => {
+        const fill = row.querySelector('.bar-fill');
+        if (fill) fill.style.width = fill.dataset.width;
+        const el = row.querySelector('small[data-count]');
+        if (!el) return;
+        const delay = reduceMotion ? 0 : i * 160 + 120;
+        setTimeout(() => countUp(el, Number(el.dataset.count), Number(el.dataset.decimals || 0), '', 900), delay);
+      });
+      barObserver.unobserve(bars);
+    }), {threshold:.3});
     document.querySelectorAll('.metric-bars').forEach(el => barObserver.observe(el));
 
     const steps = [
