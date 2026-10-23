@@ -1347,11 +1347,15 @@
       nav.classList.toggle('scrolled', window.scrollY > 30);
     }, {passive:true});
 
-    const revealObserver = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); revealObserver.unobserve(entry.target); } }), {threshold:.12});
-    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const countJobs = new WeakMap();
+    const laterJobs = new WeakMap();
     function countUp(el, value, decimals, suffix, duration) {
+      const prev = countJobs.get(el);
+      if (prev) cancelAnimationFrame(prev);
       const paint = (n) => { el.textContent = (decimals ? n.toFixed(decimals) : String(Math.round(n))) + (suffix || ''); };
+      const finalText = (decimals ? value.toFixed(decimals) : String(Math.round(value))) + (suffix || '');
+      if (!el.dataset.finalText) el.dataset.finalText = finalText;
       if (reduceMotion) { paint(value); return; }
       const start = performance.now();
       paint(0);
@@ -1359,11 +1363,47 @@
         const t = Math.min(1, (now - start) / duration);
         const eased = 1 - Math.pow(1 - t, 3);
         paint(value * eased);
-        if (t < 1) requestAnimationFrame(frame);
-        else paint(value);
+        if (t < 1) countJobs.set(el, requestAnimationFrame(frame));
+        else { paint(value); countJobs.delete(el); }
       };
-      requestAnimationFrame(frame);
+      countJobs.set(el, requestAnimationFrame(frame));
     }
+    function restoreCount(el) {
+      const job = countJobs.get(el);
+      if (job) cancelAnimationFrame(job);
+      countJobs.delete(el);
+      if (el.dataset.finalText) el.textContent = el.dataset.finalText;
+    }
+    function later(host, fn, ms) {
+      const id = setTimeout(fn, ms);
+      const list = laterJobs.get(host) || [];
+      list.push(id);
+      laterJobs.set(host, list);
+    }
+    function clearLater(host) {
+      (laterJobs.get(host) || []).forEach(clearTimeout);
+      laterJobs.delete(host);
+    }
+    function replayClass(el, name) {
+      el.classList.remove(name);
+      void el.offsetWidth;
+      el.classList.add(name);
+    }
+    function watch(elements, playAt, play, reset) {
+      const observer = new IntersectionObserver(entries => entries.forEach(entry => {
+        const el = entry.target;
+        if (entry.isIntersecting && entry.intersectionRatio >= playAt) {
+          if (el.dataset.replayOn === '1') return;
+          el.dataset.replayOn = '1';
+          play(el);
+        } else if (!entry.isIntersecting && el.dataset.replayOn === '1') {
+          el.dataset.replayOn = '0';
+          reset(el);
+        }
+      }), { threshold: [0, playAt] });
+      elements.forEach(el => observer.observe(el));
+    }
+    watch(document.querySelectorAll('.reveal'), 0.12, el => replayClass(el, 'visible'), el => el.classList.remove('visible'));
     document.querySelectorAll('.paper-table.play').forEach(table => {
       const marks = table.classList.contains('marks');
       [...table.tBodies[0].rows].forEach((row, i) => {
@@ -1379,29 +1419,29 @@
         }
       });
     });
-    const tableObserver = new IntersectionObserver(entries => entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-      const table = entry.target;
-      table.classList.add('is-on');
-      if (!reduceMotion && !table.classList.contains('marks')) {
-        table.querySelectorAll('tr.wm td.num').forEach(cell => {
-          const node = cell.querySelector('strong') || cell;
-          const match = node.textContent.trim().match(/^(-?\d+(?:\.\d+)?)(.*)$/);
-          if (!match) return;
-          const decimals = (match[1].split('.')[1] || '').length;
-          const delay = parseFloat(cell.parentElement.style.animationDelay) || 0;
-          setTimeout(() => countUp(node, Number(match[1]), decimals, match[2], 650), delay);
-        });
-      }
-      tableObserver.unobserve(table);
-    }), {threshold:.08});
-    document.querySelectorAll('.paper-table.play').forEach(table => tableObserver.observe(table));
-    const metricObserver = new IntersectionObserver(entries => entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-      entry.target.querySelectorAll('strong[data-count]').forEach(el => countUp(el, Number(el.dataset.count), Number(el.dataset.decimals || 0), el.dataset.suffix || '', 900));
-      metricObserver.unobserve(entry.target);
-    }), {threshold:.4});
-    document.querySelectorAll('.metric-card').forEach(card => metricObserver.observe(card));
+    function tableNumbers(table, fn) {
+      table.querySelectorAll('tr.wm td.num').forEach(cell => fn(cell.querySelector('strong') || cell));
+    }
+    watch(document.querySelectorAll('.paper-table.play'), 0.08, table => {
+      replayClass(table, 'is-on');
+      if (reduceMotion || table.classList.contains('marks')) return;
+      tableNumbers(table, node => {
+        const match = (node.dataset.finalText || node.textContent).trim().match(/^(-?\d+(?:\.\d+)?)(.*)$/);
+        if (!match) return;
+        const decimals = (match[1].split('.')[1] || '').length;
+        const delay = parseFloat(node.parentElement.style.animationDelay) || parseFloat(node.closest('tr').style.animationDelay) || 0;
+        later(table, () => countUp(node, Number(match[1]), decimals, match[2], 650), delay);
+      });
+    }, table => {
+      clearLater(table);
+      table.classList.remove('is-on');
+      tableNumbers(table, restoreCount);
+    });
+    watch(document.querySelectorAll('.metric-card'), 0.4, card => {
+      card.querySelectorAll('strong[data-count]').forEach(el => countUp(el, Number(el.dataset.count), Number(el.dataset.decimals || 0), el.dataset.suffix || '', 900));
+    }, card => {
+      card.querySelectorAll('strong[data-count]').forEach(restoreCount);
+    });
     document.querySelectorAll('.metric-bars').forEach(bars => {
       if (reduceMotion) return;
       bars.classList.add('will-play');
@@ -1414,21 +1454,27 @@
       const caption = bars.nextElementSibling;
       if (caption && caption.classList.contains('chart-caption')) caption.style.transitionDelay = '640ms';
     });
-    const barObserver = new IntersectionObserver(entries => entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-      const bars = entry.target;
-      bars.classList.add('is-on');
+    watch(document.querySelectorAll('.metric-bars'), 0.3, bars => {
+      replayClass(bars, 'is-on');
       bars.querySelectorAll('.bar-row').forEach((row, i) => {
         const fill = row.querySelector('.bar-fill');
         if (fill) fill.style.width = fill.dataset.width;
         const el = row.querySelector('small[data-count]');
         if (!el) return;
         const delay = reduceMotion ? 0 : i * 160 + 120;
-        setTimeout(() => countUp(el, Number(el.dataset.count), Number(el.dataset.decimals || 0), '', 900), delay);
+        later(bars, () => countUp(el, Number(el.dataset.count), Number(el.dataset.decimals || 0), '', 900), delay);
       });
-      barObserver.unobserve(bars);
-    }), {threshold:.3});
-    document.querySelectorAll('.metric-bars').forEach(el => barObserver.observe(el));
+    }, bars => {
+      clearLater(bars);
+      bars.classList.remove('is-on');
+      bars.querySelectorAll('.bar-fill').forEach(fill => {
+        fill.style.transition = 'none';
+        fill.style.width = '0';
+      });
+      void bars.offsetWidth;
+      bars.querySelectorAll('.bar-fill').forEach(fill => { fill.style.transition = ''; });
+      bars.querySelectorAll('small[data-count]').forEach(restoreCount);
+    });
 
     const steps = [
       ['Read the demonstration','Ground the world state in the observed scene, instruction, and robot trajectory.','Observe'],
